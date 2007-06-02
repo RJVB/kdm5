@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=ServiceType
+X-KDE-ServiceType=Plasma/DataEngine
+
+Comment=Plasma Data Engine
+Comment[de]=Plasma Daten-Treiber
+Comment[zh_TW]=Plasma 資料引擎
+
+[PropertyDef::X-EngineName]
+Type=QString
+
