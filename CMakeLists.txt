@@ -12,6 +12,8 @@ set(KDE4WORKSPACE_VERSION ${KDE4WORKSPACE_VERSION_MAJOR}.${KDE4WORKSPACE_VERSION
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH} )
 
+set(CMAKE_CXX_STANDARD 11)
+
 #search packages used by KDE
 set(QT_MIN_VERSION "4.7.0")
 
@@ -193,10 +195,10 @@ include(ConfigureChecks.cmake)
 if(NOT WIN32)
   configure_file(config-unix.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-unix.h )
   configure_file(config-X11.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-X11.h )
-  if(NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr")
-    set(EXPORT_XCURSOR_PATH "XCURSOR_PATH=${CMAKE_INSTALL_PREFIX}/share/icons:$XCURSOR_PATH\":~/.icons:/usr/share/icons:/usr/share/pixmaps:/usr/X11R6/lib/X11/icons\"; export XCURSOR_PATH")
-  endif(NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr")
-  configure_file(startkde.cmake ${CMAKE_CURRENT_BINARY_DIR}/startkde  @ONLY)
+#   if(NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr")
+#     set(EXPORT_XCURSOR_PATH "XCURSOR_PATH=${CMAKE_INSTALL_PREFIX}/share/icons:$XCURSOR_PATH\":~/.icons:/usr/share/icons:/usr/share/pixmaps:/usr/X11R6/lib/X11/icons\"; export XCURSOR_PATH")
+#   endif(NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr")
+#   configure_file(startkde.cmake ${CMAKE_CURRENT_BINARY_DIR}/startkde  @ONLY)
 endif(NOT WIN32)
 configure_file(config-workspace.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-workspace.h )
 
@@ -210,53 +212,53 @@ add_definitions(-DDISABLE_NEPOMUK_LEGACY)
 add_subdirectory(cmake)
 add_subdirectory(libs)
 
-# system settings (kcontrol replacement)
+# # system settings (kcontrol replacement)
+# if(${KDE_PLATFORM_PROFILE} STREQUAL "Desktop")
+#    macro_optional_add_subdirectory( systemsettings )
+# endif(${KDE_PLATFORM_PROFILE} STREQUAL "Desktop")
+# 
+# # core apps
+# if(NOT WIN32)
+#    macro_optional_add_subdirectory( kcheckpass )
+#    macro_optional_add_subdirectory( kwin )
+#    macro_optional_add_subdirectory( ksmserver )
+# 
+#    find_package(JPEG REQUIRED)
+#    find_package(PNG REQUIRED)
+#    macro_optional_add_subdirectory( ksplash )
+# 
+#    macro_optional_add_subdirectory( powerdevil )
+#    macro_optional_add_subdirectory( qguiplatformplugin_kde )
+#    if (NOT CMAKE_SYSTEM_NAME MATCHES Darwin)
+#       macro_optional_add_subdirectory( ksysguard )
+#    endif (NOT CMAKE_SYSTEM_NAME MATCHES Darwin)
+# endif(NOT WIN32)
+# 
 if(${KDE_PLATFORM_PROFILE} STREQUAL "Desktop")
-   macro_optional_add_subdirectory( systemsettings )
-endif(${KDE_PLATFORM_PROFILE} STREQUAL "Desktop")
-
-# core apps
-if(NOT WIN32)
-   macro_optional_add_subdirectory( kcheckpass )
-   macro_optional_add_subdirectory( kwin )
-   macro_optional_add_subdirectory( ksmserver )
-
-   find_package(JPEG REQUIRED)
-   find_package(PNG REQUIRED)
-   macro_optional_add_subdirectory( ksplash )
-
-   macro_optional_add_subdirectory( powerdevil )
-   macro_optional_add_subdirectory( qguiplatformplugin_kde )
-   if (NOT CMAKE_SYSTEM_NAME MATCHES Darwin)
-      macro_optional_add_subdirectory( ksysguard )
-   endif (NOT CMAKE_SYSTEM_NAME MATCHES Darwin)
-endif(NOT WIN32)
-
-if(${KDE_PLATFORM_PROFILE} STREQUAL "Desktop")
-   macro_optional_add_subdirectory(kcontrol)
-   macro_optional_add_subdirectory(klipper)
-   macro_optional_add_subdirectory(kmenuedit)
-   macro_optional_add_subdirectory(krunner)
-   macro_optional_add_subdirectory(solid)
-   macro_optional_add_subdirectory(kstartupconfig)
-   macro_optional_add_subdirectory(freespacenotifier)
-   macro_optional_add_subdirectory(kscreensaver)
-
-   # data
-   macro_optional_add_subdirectory(doc)
-
-   if (Q_WS_X11)
-      macro_optional_add_subdirectory(kinfocenter)
-      macro_optional_add_subdirectory(ktouchpadenabler)
-   endif (Q_WS_X11)
-
-   if(NOT WIN32)
-      macro_optional_add_subdirectory(kcminit)
-      macro_optional_add_subdirectory(khotkeys)
-      macro_optional_add_subdirectory(kwrited)
-      macro_optional_add_subdirectory(ksystraycmd)
-      macro_optional_add_subdirectory(appmenu)
-   endif(NOT WIN32)
+#    macro_optional_add_subdirectory(kcontrol)
+#    macro_optional_add_subdirectory(klipper)
+#    macro_optional_add_subdirectory(kmenuedit)
+#    macro_optional_add_subdirectory(krunner)
+#    macro_optional_add_subdirectory(solid)
+#    macro_optional_add_subdirectory(kstartupconfig)
+#    macro_optional_add_subdirectory(freespacenotifier)
+#    macro_optional_add_subdirectory(kscreensaver)
+# 
+#    # data
+#    macro_optional_add_subdirectory(doc)
+# 
+#    if (Q_WS_X11)
+#       macro_optional_add_subdirectory(kinfocenter)
+#       macro_optional_add_subdirectory(ktouchpadenabler)
+#    endif (Q_WS_X11)
+# 
+#    if(NOT WIN32)
+#       macro_optional_add_subdirectory(kcminit)
+#       macro_optional_add_subdirectory(khotkeys)
+#       macro_optional_add_subdirectory(kwrited)
+#       macro_optional_add_subdirectory(ksystraycmd)
+#       macro_optional_add_subdirectory(appmenu)
+#    endif(NOT WIN32)
 
    if(X11_Xau_FOUND AND X11_Xdmcp_FOUND)
       macro_optional_add_subdirectory( kdm )
@@ -265,19 +267,19 @@ if(${KDE_PLATFORM_PROFILE} STREQUAL "Desktop")
    endif(X11_Xau_FOUND AND X11_Xdmcp_FOUND)
 endif(${KDE_PLATFORM_PROFILE} STREQUAL "Desktop")
 
-if(NOT WIN32)
-    # data
-    macro_optional_add_subdirectory(cursors)
-endif(NOT WIN32)
-
-macro_optional_add_subdirectory(plasma)
-macro_optional_add_subdirectory(statusnotifierwatcher)
-macro_optional_add_subdirectory(kstyles)
+# if(NOT WIN32)
+#     # data
+#     macro_optional_add_subdirectory(cursors)
+# endif(NOT WIN32)
+# 
+# macro_optional_add_subdirectory(plasma)
+# macro_optional_add_subdirectory(statusnotifierwatcher)
+# macro_optional_add_subdirectory(kstyles)
 
 ########### install files ###############
-if(NOT WIN32)
-  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/startkde DESTINATION ${BIN_INSTALL_DIR})
-endif(NOT WIN32)
+# if(NOT WIN32)
+#   install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/startkde DESTINATION ${BIN_INSTALL_DIR})
+# endif(NOT WIN32)
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
@@ -329,28 +331,28 @@ make_install_path_absolute(KDE4WORKSPACE_SERVICETYPES_DIR ${SERVICETYPES_INSTALL
 
 set(KDE4WORKSPACE_TARGET_PREFIX KDE4Workspace__)
 
-configure_file(KDE4WorkspaceConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/KDE4WorkspaceConfig.cmake" @ONLY)
-
-# this file will be installed too and will be used by cmake when searching for the Config.cmake file to check the version of kdepimlibs, Alex
-macro_write_basic_cmake_version_file(${CMAKE_CURRENT_BINARY_DIR}/KDE4WorkspaceConfigVersion.cmake 
-                                     ${KDE4WORKSPACE_VERSION_MAJOR} ${KDE4WORKSPACE_VERSION_MINOR} ${KDE4WORKSPACE_VERSION_PATCH})
-
-set(_KDE4WorkspaceConfig_INSTALL_DIR ${LIB_INSTALL_DIR}/KDE4Workspace/cmake)
-# places where find_package() looks for FooConfig.cmake files:
-# CMake >= 2.6.0 looks in lib/Foo*/cmake/, CMake >= 2.6.3 also looks in
-# lib/cmake/Foo*/, which packagers prefer. So they can set the KDE4_USE_COMMON_CMAKE_PACKAGE_CONFIG_DIR
-# option to have kdepimlibs install its Config file there. Alex
-if(KDE4_USE_COMMON_CMAKE_PACKAGE_CONFIG_DIR)
-   set(_KDE4WorkspaceConfig_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/KDE4Workspace)
-endif(KDE4_USE_COMMON_CMAKE_PACKAGE_CONFIG_DIR)
-
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/KDE4WorkspaceConfig.cmake
-              ${CMAKE_CURRENT_BINARY_DIR}/KDE4WorkspaceConfigVersion.cmake
-        DESTINATION ${_KDE4WorkspaceConfig_INSTALL_DIR})
-
-install(EXPORT kdeworkspaceLibraryTargets 
-        NAMESPACE ${KDE4WORKSPACE_TARGET_PREFIX}
-        DESTINATION ${_KDE4WorkspaceConfig_INSTALL_DIR}
-        FILE KDE4WorkspaceLibraryTargets.cmake )
-
-
+# configure_file(KDE4WorkspaceConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/KDE4WorkspaceConfig.cmake" @ONLY)
+# 
+# # this file will be installed too and will be used by cmake when searching for the Config.cmake file to check the version of kdepimlibs, Alex
+# macro_write_basic_cmake_version_file(${CMAKE_CURRENT_BINARY_DIR}/KDE4WorkspaceConfigVersion.cmake 
+#                                      ${KDE4WORKSPACE_VERSION_MAJOR} ${KDE4WORKSPACE_VERSION_MINOR} ${KDE4WORKSPACE_VERSION_PATCH})
+# 
+# set(_KDE4WorkspaceConfig_INSTALL_DIR ${LIB_INSTALL_DIR}/KDE4Workspace/cmake)
+# # places where find_package() looks for FooConfig.cmake files:
+# # CMake >= 2.6.0 looks in lib/Foo*/cmake/, CMake >= 2.6.3 also looks in
+# # lib/cmake/Foo*/, which packagers prefer. So they can set the KDE4_USE_COMMON_CMAKE_PACKAGE_CONFIG_DIR
+# # option to have kdepimlibs install its Config file there. Alex
+# if(KDE4_USE_COMMON_CMAKE_PACKAGE_CONFIG_DIR)
+#    set(_KDE4WorkspaceConfig_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/KDE4Workspace)
+# endif(KDE4_USE_COMMON_CMAKE_PACKAGE_CONFIG_DIR)
+# 
+# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/KDE4WorkspaceConfig.cmake
+#               ${CMAKE_CURRENT_BINARY_DIR}/KDE4WorkspaceConfigVersion.cmake
+#         DESTINATION ${_KDE4WorkspaceConfig_INSTALL_DIR})
+# 
+# install(EXPORT kdeworkspaceLibraryTargets 
+#         NAMESPACE ${KDE4WORKSPACE_TARGET_PREFIX}
+#         DESTINATION ${_KDE4WorkspaceConfig_INSTALL_DIR}
+#         FILE KDE4WorkspaceLibraryTargets.cmake )
+# 
+# 

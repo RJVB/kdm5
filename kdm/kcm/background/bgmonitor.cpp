@@ -32,7 +32,18 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
+#ifdef HAVE_SPW
 #include "kworkspace/screenpreviewwidget.h"
+#else
+#include <QWidget>
+class ScreenPreviewWidget : public QWidget 
+{
+public:
+    ScreenPreviewWidget(QWidget *parent)
+        : QWidget(parent)
+    {}
+};
+#endif
 
 // Constants used (should they be placed somewhere?)
 // Size of monitor image: 200x186
@@ -46,12 +57,16 @@ BGMonitorArrangement::BGMonitorArrangement(QWidget *parent)
 
     int numScreens = QApplication::desktop()->numScreens();
     for (int screen = 0; screen < numScreens; ++screen) {
+#ifdef HAVE_SPW
         ScreenPreviewWidget *previewWidget = new ScreenPreviewWidget(this);
         m_pBGMonitor[screen] = previewWidget;
         previewWidget->setWhatsThis(i18n("This picture of a monitor contains a preview of what the current settings will look like on your desktop."));
 
         connect(previewWidget, SIGNAL(imageDropped(QString)), this, SIGNAL(imageDropped(QString)));
         previewWidget->setFixedSize(180, 180);
+#else
+        m_pBGMonitor[screen] = new ScreenPreviewWidget(this);
+#endif
     }
 
     parent->setFixedSize(210 * numScreens, 200);
@@ -126,8 +141,10 @@ void BGMonitorArrangement::updateArrangement()
         }
 
 
+#ifdef HAVE_SPW
         m_pBGMonitor[screen]->setGeometry(QRect(expandedTopLeft, expandedPreviewSize));
         m_pBGMonitor[screen]->setRatio((qreal)previewSize.width() / (qreal)previewSize.height());
+#endif
     }
 }
 
@@ -141,9 +158,11 @@ void BGMonitorArrangement::resizeEvent(QResizeEvent *e)
 
 void BGMonitorArrangement::setPixmap(const QPixmap &pm)
 {
+#ifdef HAVE_SPW
     for (int screen = 0; screen < m_pBGMonitor.size(); ++screen) {
         m_pBGMonitor[screen]->setPreview(pm);
     }
+#endif
 }
 //END class BGMonitorArrangement
 

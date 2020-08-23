@@ -20,7 +20,12 @@
 #ifndef POSITIONER_H
 #define POSITIONER_H
 
+#ifdef HAVE_SPW
 #include "kworkspace/screenpreviewwidget.h"
+#else
+#include <QWidget>
+using ScreenPreviewWidget = QWidget;
+#endif
 
 class QFrame;
 class QLabel;
