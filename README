@@ -1,1 +1,6 @@
-KDE Workspace consisting of what is the desktop.  The applications and libraries included aren't required to be portable and probably will only work with X11.  On other desktops such as OS X and Windows, users wouldn't run these applications, but use the native ones instead.  The typical application shouldn't have dependencies in workspace unless they are a component such as a screen-saver or panel applet.
+This is the "old" KDE Display Manager that came with the KDE Plasma4 Desktop Environment
+
+isolated from the KDE-Workspace package that it was part of.
+
+The intended goal is to reboot it as a Qt5/KF5-based, more traditionally designed
+greeter alternative to fugly QML-based SDDM .
