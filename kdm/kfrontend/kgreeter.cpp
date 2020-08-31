@@ -27,9 +27,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "kdmconfig.h"
 #include "kdmclock.h"
 #include "kdm_greet.h"
+#ifdef KDM_THEMEABLE
 #include "themer/kdmthemer.h"
 #include "themer/kdmitem.h"
 #include "themer/kdmlabel.h"
+#endif
 
 #include <KColorScheme>
 #include <KConfigGroup>
@@ -883,7 +885,7 @@ KStdGreeter::verifyRetry()
     inherited::verifyRetry();
 }
 
-
+#ifdef KDM_THEMEABLE
 KThemedGreeter::KThemedGreeter(KdmThemer *_themer)
     : KGreeter(true)
     , themer(_themer)
@@ -1103,5 +1105,6 @@ KThemedGreeter::keyPressEvent(QKeyEvent *e)
         (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter))
         accept();
 }
+#endif
 
 #include "kgreeter.moc"

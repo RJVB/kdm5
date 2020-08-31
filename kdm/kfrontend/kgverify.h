@@ -36,7 +36,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <sys/time.h>
 #include <time.h>
 
+#ifdef KDM_THEMEABLE
 class KdmThemer;
+#endif
 
 class KLibrary;
 class KPushButton;
@@ -203,6 +205,7 @@ class KGStdVerify : public KGVerify {
     virtual bool gplugHasNode(const QString &id);
 };
 
+#ifdef KDM_THEMEABLE
 class KGThemedVerify : public KGVerify {
     Q_OBJECT
     typedef KGVerify inherited;
@@ -227,6 +230,7 @@ class KGThemedVerify : public KGVerify {
   public: // from KGreetPluginHandler
     virtual bool gplugHasNode(const QString &id);
 };
+#endif
 
 class KGChTok : public FDialog, public KGVerifyHandler {
     Q_OBJECT

@@ -71,7 +71,7 @@ Positioner::Positioner(QWidget *parent)
     , m_y(50)
 {
     QDesktopWidget *desktop = QApplication::desktop();
-#ifdef HAVE_SPW
+#ifdef KDM_THEMEABLE
     setRatio((qreal)desktop->width() / (qreal)desktop->height());
 #endif
     m_anchor = QPixmap(KStandardDirs::locate("data", "kcontrol/pics/anchor.png"));
@@ -152,7 +152,7 @@ Positioner::resizeEvent(QResizeEvent *event)
 
     m_frame->setGeometry(0, 0, rs.width() + fw, rs.height() + fw);
     m_frame->resize(size());
-#ifdef HAVE_SPW
+#ifdef KDM_THEMEABLE
     m_screen->setGeometry(previewRect());
 #endif
 

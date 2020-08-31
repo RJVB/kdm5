@@ -18,19 +18,26 @@ set(kcm_kdm_PART_SRCS ${kcmbackgroundlib_SRCS} ${backgroundlib_SRCS}
    background.cpp
    kdm-gen.cpp
    kdm-dlg.cpp
-   kdm-theme.cpp
    kdm-shut.cpp
    kdm-users.cpp
    kdm-conv.cpp
    main.cpp
    kbackedcombobox.cpp
    positioner.cpp)
+if (KDM_THEMEABLE)
+   set(kcm_kdm_PART_SRCS ${kcm_kdm_PART_SRCS}
+   kdm-theme.cpp)
+endif()
 
 
 kde4_add_plugin(kcm_kdm ${kcm_kdm_PART_SRCS})
 
 
-target_link_libraries(kcm_kdm ${KDE4_KIO_LIBS} ${QIMAGEBLITZ_LIBRARIES} ${KDE4_KNEWSTUFF3_LIBS} ${X11_LIBRARIES} kworkspace)
+target_link_libraries(kcm_kdm ${KDE4_KIO_LIBS} ${QIMAGEBLITZ_LIBRARIES} ${KDE4_KNEWSTUFF3_LIBS} ${X11_LIBRARIES})
+if (KDM_THEMEABLE)
+    target_link_libraries(kcm_kdm kworkspace)
+endif()
+
 
 macro_add_file_dependencies(kdm-shut.cpp ${confci})
 add_dependencies(kcm_kdm ConfigCi)
@@ -51,4 +58,6 @@ kde4_install_auth_actions(org.kde.kcontrol.kcmkdm kcmkdm_actions.actions)
 install( FILES kdm.desktop  DESTINATION  ${SERVICES_INSTALL_DIR} )
 
 install( FILES anchor.png  DESTINATION  ${DATA_INSTALL_DIR}/kcontrol/pics )
-install( FILES kdm.knsrc DESTINATION ${CONFIG_INSTALL_DIR} )
+if (KDM_THEMEABLE)
+    install( FILES kdm.knsrc DESTINATION ${CONFIG_INSTALL_DIR} )
+endif()

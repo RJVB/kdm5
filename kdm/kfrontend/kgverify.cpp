@@ -28,8 +28,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "kdmconfig.h"
 #include "kdm_greet.h"
 
+#ifdef KDM_THEMEABLE
 #include "themer/kdmthemer.h"
 #include "themer/kdmitem.h"
+#endif
 
 #include <KColorScheme>
 #include <kguiitem.h>
@@ -1091,6 +1093,7 @@ KGStdVerify::updateStatus()
     }
 }
 
+#ifdef KDM_THEMEABLE
 KGThemedVerify::KGThemedVerify(KGVerifyHandler *_handler,
                                KdmThemer *_themer,
                                QWidget *_parent, QWidget *_predecessor,
@@ -1148,7 +1151,7 @@ KGThemedVerify::updateStatus()
                           enabled && !suspended && capsLocked,
                           timedLeft);
 }
-
+#endif
 
 KGChTok::KGChTok(QWidget *_parent, const QString &user,
                  const PluginList &pluginList, int curPlugin,

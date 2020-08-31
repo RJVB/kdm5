@@ -236,6 +236,7 @@ KDModule::KDModule(QWidget *parent, const QVariantList &)
     lbl->setAlignment(Qt::AlignCenter);
     background_stack->addWidget(lbl);
 
+#ifdef KDM_THEMEABLE
     theme_stack = new QStackedWidget(this);
     tab->addTab(theme_stack, i18n("&Theme"));
     lbl = new QLabel(
@@ -246,6 +247,7 @@ KDModule::KDModule(QWidget *parent, const QVariantList &)
     theme = new KDMThemeWidget(theme_stack);
     theme_stack->addWidget(theme);
     connect(theme, SIGNAL(changed()), SLOT(changed()));
+#endif
 
     sessions = new KDMSessionsWidget(this);
     tab->addTab(sessions, i18n("&Shutdown"));
@@ -326,7 +328,9 @@ void KDModule::load()
     general->load();
     dialog->load();
     background->load();
+#ifdef KDM_THEMEABLE
     theme->load();
+#endif
     users->load();
     sessions->load();
     convenience->load();
@@ -341,7 +345,9 @@ void KDModule::save()
     general->save();
     dialog->save();
     background->save();
+#ifdef KDM_THEMEABLE
     theme->save();
+#endif
     users->save();
     sessions->save();
     convenience->save();
@@ -382,7 +388,9 @@ void KDModule::defaults()
     general->defaults();
     dialog->defaults();
     background->defaults();
+#ifdef KDM_THEMEABLE
     theme->defaults();
+#endif
     users->defaults();
     sessions->defaults();
     convenience->defaults();
@@ -456,9 +464,11 @@ void KDModule::slotMinMaxUID(int min, int max)
 
 void KDModule::slotUseThemeChanged(bool use)
 {
+#ifdef KDM_THEMEABLE
     dialog_stack->setCurrentIndex(use);
     background_stack->setCurrentIndex(use);
     theme_stack->setCurrentIndex(use);
+#endif
 }
 
 #include "main.moc"

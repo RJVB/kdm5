@@ -59,7 +59,7 @@
 #include "bgadvanced.h"
 #include "bgdialog.h"
 
-#ifdef HAVE_SPW
+#ifdef KDM_THEMEABLE
 #include "kworkspace/screenpreviewwidget.h"
 #endif
 
@@ -707,7 +707,7 @@ void BGDialog::updateUI()
         r->start(true);
     } else {
         for (unsigned j = 0; j < m_numScreens; ++j) {
-#ifdef HAVE_SPW
+#ifdef KDM_THEMEABLE
             m_renderer[j+2]->stop();
             m_renderer[j+2]->setPreview(m_pMonitorArrangement->monitor(j)->previewRect().size());
             m_renderer[j+2]->start(true);
@@ -733,7 +733,7 @@ void BGDialog::slotPreviewDone(int screen_done)
     if (m_eScreen == 0) {
         m_pMonitorArrangement->setPixmap(pm);
     }
-#ifdef HAVE_SPW
+#ifdef KDM_THEMEABLE
     else if (m_eScreen == 1) {
         for (unsigned i = 0; i < m_pMonitorArrangement->numMonitors(); ++i)
             m_pMonitorArrangement->monitor(i)->setPreview(pm);

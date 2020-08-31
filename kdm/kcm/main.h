@@ -31,7 +31,9 @@
 
 class KDMGeneralWidget;
 class KDMDialogWidget;
+#ifdef KDM_THEMEABLE
 class KDMThemeWidget;
+#endif
 class KDMSessionsWidget;
 class KDMUsersWidget;
 class KDMConvenienceWidget;
@@ -68,13 +70,17 @@ class KDModule : public KCModule {
     KDMGeneralWidget *general;
     KDMDialogWidget *dialog;
     KBackground *background;
+#ifdef KDM_THEMEABLE
     KDMThemeWidget *theme;
+#endif
     KDMSessionsWidget *sessions;
     KDMUsersWidget *users;
     KDMConvenienceWidget *convenience;
     QStackedWidget *dialog_stack;
     QStackedWidget *background_stack;
+#ifdef KDM_THEMEABLE
     QStackedWidget *theme_stack;
+#endif
 
     QMap<QString, QPair<int, QStringList> > usermap;
     QMap<QString, int> groupmap;

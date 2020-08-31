@@ -22,6 +22,8 @@ include(KDE4Defaults)
 
 option(WITH_XINERAMA "Xinerama support for multi-headed X displays" ON)
 
+option(KDM_THEMEABLE "Build KDM with themeing support" OFF)
+
 find_package(QImageBlitz)
 set_package_properties(QImageBlitz PROPERTIES DESCRIPTION "An image effects library"
                        URL "http://sourceforge.net/projects/qimageblitz"

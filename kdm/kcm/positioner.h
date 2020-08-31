@@ -20,7 +20,7 @@
 #ifndef POSITIONER_H
 #define POSITIONER_H
 
-#ifdef HAVE_SPW
+#ifdef KDM_THEMEABLE
 #include "kworkspace/screenpreviewwidget.h"
 #else
 #include <QWidget>

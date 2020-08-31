@@ -1,6 +1,8 @@
 include(MacroAddFileDependencies)
 
-add_subdirectory( themes )
+if (KDM_THEMEABLE)
+    add_subdirectory( themes )
+endif()
 add_subdirectory( pics )
 add_subdirectory( sessions )
 
@@ -10,26 +12,28 @@ include_directories(
 	${QIMAGEBLITZ_INCLUDES}
 )
 
-set(kdmthemer_SRCS
-	themer/kdmthemer.cpp
-	themer/kdmthemer.h
-	themer/kdmitem.cpp
-	themer/kdmitem.h
-	themer/kdmpixmap.cpp
-	themer/kdmpixmap.h
-	themer/kdmrect.cpp
-	themer/kdmrect.h
-	themer/kdmlist.cpp
-	themer/kdmlist.h
-	themer/kdmlabel.cpp
-	themer/kdmlabel.h
-	themer/kdmbutton.cpp
-	themer/kdmbutton.h
-	themer/kdmlayout.cpp
-	themer/kdmlayout.h
-	themer/parse.cpp
-	themer/parse.h
-)
+if (KDM_THEMEABLE)
+    set(kdmthemer_SRCS
+        themer/kdmthemer.cpp
+        themer/kdmthemer.h
+        themer/kdmitem.cpp
+        themer/kdmitem.h
+        themer/kdmpixmap.cpp
+        themer/kdmpixmap.h
+        themer/kdmrect.cpp
+        themer/kdmrect.h
+        themer/kdmlist.cpp
+        themer/kdmlist.h
+        themer/kdmlabel.cpp
+        themer/kdmlabel.h
+        themer/kdmbutton.cpp
+        themer/kdmbutton.h
+        themer/kdmlayout.cpp
+        themer/kdmlayout.h
+        themer/parse.cpp
+        themer/parse.h
+    )
+endif()
 set(kdm_greet_SRCS
 	kdm_greet.c
 	kdm_greet.h

@@ -31,7 +31,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifdef XDMCP
 # include "kchooser.h"
 #endif
+#ifdef KDM_THEMEABLE
 #include "themer/kdmthemer.h"
+#endif
 #include "utils.h"
 
 #include <kcrash.h>
@@ -371,6 +373,7 @@ main(int argc ATTR_UNUSED, char **argv)
         app.setPalette(KGlobalSettings::createApplicationPalette(config));
     }
 
+#ifdef KDM_THEMEABLE
     KdmThemer *themer;
     if (_useTheme && !_theme.isEmpty()) {
         QMap<QString, bool> showTypes;
@@ -394,6 +397,9 @@ main(int argc ATTR_UNUSED, char **argv)
     } else {
         themer = 0;
     }
+#else
+#define themer NULL
+#endif
 
     setupModifiers(dpy, _numLockStatus);
     secureDisplay(dpy);
@@ -411,6 +417,7 @@ main(int argc ATTR_UNUSED, char **argv)
 
     gSendInt(G_Ready);
 
+#ifdef KDM_THEMEABLE
     if (themer) {
         // Group by size to avoid rescaling images repeatedly
         QHash<QSize, QList<int> > scrns;
@@ -437,6 +444,7 @@ main(int argc ATTR_UNUSED, char **argv)
         dw->setPalette(palette);
         XClearWindow(dpy, dw->winId());
     }
+#endif
 
     int rslt = ex_exit;
     for (;;) {
@@ -476,9 +484,11 @@ main(int argc ATTR_UNUSED, char **argv)
             if ((cmd != G_GreetTimed && !_autoLoginAgain) ||
                     _autoLoginUser.isEmpty())
                 _autoLoginDelay = 0;
+#ifdef KDM_THEMEABLE
             if (themer)
                 dialog = new KThemedGreeter(themer);
             else
+#endif
                 dialog = new KStdGreeter;
             if (*_preloader) {
                 proc2 = new KProcess;
@@ -511,7 +521,9 @@ main(int argc ATTR_UNUSED, char **argv)
     KGVerify::done();
 
     delete proc;
+#ifdef KDM_THEMEABLE
     delete themer;
+#endif
 
     unsecureDisplay(dpy);
     restoreModifiers();

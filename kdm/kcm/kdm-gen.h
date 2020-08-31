@@ -50,7 +50,9 @@ class KDMGeneralWidget : public QWidget {
   private:
     void set_def();
 
+#ifdef KDM_THEMEABLE
     QCheckBox *useThemeCheck;
+#endif
     KBackedComboBox *guicombo;
     KBackedComboBox *colcombo;
     KLanguageButton *langcombo;

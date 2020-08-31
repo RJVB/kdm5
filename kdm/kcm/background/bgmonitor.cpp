@@ -32,7 +32,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-#ifdef HAVE_SPW
+#ifdef KDM_THEMEABLE
 #include "kworkspace/screenpreviewwidget.h"
 #else
 #include <QWidget>
@@ -57,7 +57,7 @@ BGMonitorArrangement::BGMonitorArrangement(QWidget *parent)
 
     int numScreens = QApplication::desktop()->numScreens();
     for (int screen = 0; screen < numScreens; ++screen) {
-#ifdef HAVE_SPW
+#ifdef KDM_THEMEABLE
         ScreenPreviewWidget *previewWidget = new ScreenPreviewWidget(this);
         m_pBGMonitor[screen] = previewWidget;
         previewWidget->setWhatsThis(i18n("This picture of a monitor contains a preview of what the current settings will look like on your desktop."));
@@ -141,7 +141,7 @@ void BGMonitorArrangement::updateArrangement()
         }
 
 
-#ifdef HAVE_SPW
+#ifdef KDM_THEMEABLE
         m_pBGMonitor[screen]->setGeometry(QRect(expandedTopLeft, expandedPreviewSize));
         m_pBGMonitor[screen]->setRatio((qreal)previewSize.width() / (qreal)previewSize.height());
 #endif
@@ -158,7 +158,7 @@ void BGMonitorArrangement::resizeEvent(QResizeEvent *e)
 
 void BGMonitorArrangement::setPixmap(const QPixmap &pm)
 {
-#ifdef HAVE_SPW
+#ifdef KDM_THEMEABLE
     for (int screen = 0; screen < m_pBGMonitor.size(); ++screen) {
         m_pBGMonitor[screen]->setPreview(pm);
     }

@@ -123,6 +123,7 @@ class KStdGreeter : public KGreeter {
     virtual void verifyRetry();
 };
 
+#ifdef KDM_THEMEABLE
 class KThemedGreeter : public KGreeter {
     Q_OBJECT
     typedef KGreeter inherited;
@@ -154,5 +155,6 @@ class KThemedGreeter : public KGreeter {
 //    virtual void verifyFailed();
 //    virtual void verifyRetry();
 };
+#endif
 
 #endif /* KGREETER_H */
