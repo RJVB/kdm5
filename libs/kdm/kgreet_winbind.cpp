@@ -24,11 +24,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "kgreet_winbind.h"
 
-#include <klocale.h>
-#include <kglobal.h>
+#include <klocalizedstring.h>
 #include <kdebug.h>
 #include <kcombobox.h>
 #include <klineedit.h>
+#include <kcompletion.h>
 #include <kuser.h>
 #include <kprocess.h>
 
@@ -220,7 +220,7 @@ KWinbindGreeter::loadUsers(const QStringList &users)
     KCompletion *userNamesCompletion = new KCompletion;
     loginEdit->setCompletionObject(userNamesCompletion);
     loginEdit->setAutoDeleteCompletionObject(true);
-    loginEdit->setCompletionMode(KGlobalSettings::CompletionAuto);
+    loginEdit->setCompletionMode(KCompletion::CompletionAuto);
     slotChangedDomain(defaultDomain);
 }
 
@@ -605,13 +605,13 @@ static bool init(const QString &,
     }
     separator = sepstr[0].toLatin1();
 
-    KGlobal::locale()->insertCatalog("kgreet_winbind");
+    KLocalizedString::setApplicationDomain("kgreet_winbind");
     return true;
 }
 
 static void done(void)
 {
-    KGlobal::locale()->removeCatalog("kgreet_winbind");
+//     KGlobal::locale()->removeCatalog("kgreet_winbind");
     // avoid static deletion problems ... hopefully
     staticDomains.clear();
     defaultDomain.clear();
@@ -633,4 +633,4 @@ KDE_EXPORT KGreeterPluginInfo kgreeterplugin_info = {
     init, done, create
 };
 
-#include "kgreet_winbind.moc"
+#include "moc_kgreet_winbind.cpp"

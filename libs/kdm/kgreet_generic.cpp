@@ -28,9 +28,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "kgreet_generic.h"
 
-#include <kglobal.h>
-#include <klocale.h>
+#include <klocalizedstring.h>
 #include <klineedit.h>
+#include <kcompletion.h>
 #include <kuser.h>
 
 #include <QLayout>
@@ -182,7 +182,7 @@ KGenericGreeter::textPrompt(const char *prompt, bool echo, bool /* nonBlocking *
                 userNamesCompletion->setItems(m_users);
                 m_lineEdit->setCompletionObject(userNamesCompletion);
                 m_lineEdit->setAutoDeleteCompletionObject(true);
-                m_lineEdit->setCompletionMode(KGlobalSettings::CompletionAuto);
+                m_lineEdit->setCompletionMode(KCompletion::CompletionAuto);
             }
             if (!curUser.isEmpty()) {
                 m_lineEdit->setText(curUser);
@@ -327,13 +327,13 @@ static bool init(const QString &,
     // This implies that the first field is the presettable entity, if any.
     if (getConf(ctx, "generic.Presettable", QVariant(false)).toBool())
         kgreeterplugin_info.flags |= KGreeterPluginInfo::Presettable;
-    KGlobal::locale()->insertCatalog("kgreet_generic");
+    KLocalizedString::setApplicationDomain("kgreet_generic");
     return true;
 }
 
 static void done(void)
 {
-    KGlobal::locale()->removeCatalog("kgreet_generic");
+//     KGlobal::locale()->removeCatalog("kgreet_generic");
 }
 
 static KGreeterPlugin *
@@ -352,4 +352,4 @@ KDE_EXPORT KGreeterPluginInfo kgreeterplugin_info = {
     init, done, create
 };
 
-#include "kgreet_generic.moc"
+#include "moc_kgreet_generic.cpp"

@@ -24,9 +24,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "kgreet_classic.h"
 
-#include <kglobal.h>
-#include <klocale.h>
+#include <klocalizedstring.h>
 #include <klineedit.h>
+#include <kcompletion.h>
 #include <kuser.h>
 
 #include <QRegExp>
@@ -147,7 +147,7 @@ KClassicGreeter::loadUsers(const QStringList &users)
     userNamesCompletion->setItems(users);
     loginEdit->setCompletionObject(userNamesCompletion);
     loginEdit->setAutoDeleteCompletionObject(true);
-    loginEdit->setCompletionMode(KGlobalSettings::CompletionAuto);
+    loginEdit->setCompletionMode(KCompletion::CompletionAuto);
 }
 
 void // virtual
@@ -452,13 +452,13 @@ static bool init(const QString &,
                  void *ctx)
 {
     echoMode = getConf(ctx, "EchoPasswd", QVariant(-1)).toInt();
-    KGlobal::locale()->insertCatalog("kgreet_classic");
+    KLocalizedString::setApplicationDomain("kgreet_classic");
     return true;
 }
 
 static void done(void)
 {
-    KGlobal::locale()->removeCatalog("kgreet_classic");
+//     KGlobal::locale()->removeCatalog("kgreet_classic");
 }
 
 static KGreeterPlugin *
@@ -477,4 +477,4 @@ KDE_EXPORT KGreeterPluginInfo kgreeterplugin_info = {
     init, done, create
 };
 
-#include "kgreet_classic.moc"
+#include "moc_kgreet_classic.cpp"
