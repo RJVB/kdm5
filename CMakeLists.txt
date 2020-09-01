@@ -1,28 +1,68 @@
-project(KDEBASE_WORKSPACE)
+project(KDM)
 # set_package_properties appeared in cmake 2.8.6
 # TODO: Remove when kdelibs >= 4.10 will be required
 cmake_minimum_required(VERSION 2.8.6 FATAL_ERROR)
 
 # Used e.g. in KDE4WorkspaceConfig.cmake, Alex
 set(KDE4WORKSPACE_VERSION_MAJOR 4)
-set(KDE4WORKSPACE_VERSION_MINOR 10)
-set(KDE4WORKSPACE_VERSION_PATCH 60)
+set(KDE4WORKSPACE_VERSION_MINOR 99)
+set(KDE4WORKSPACE_VERSION_PATCH 90)
 set(KDE4WORKSPACE_VERSION ${KDE4WORKSPACE_VERSION_MAJOR}.${KDE4WORKSPACE_VERSION_MINOR}.${KDE4WORKSPACE_VERSION_PATCH} )
 
+find_package(ECM 0.0.8 REQUIRED NO_MODULE)
+
+include(CMakePackageConfigHelpers)
+include(FeatureSummary)
+include(WriteBasicConfigVersionFile)
+
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH} )
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
+include(ECMMarkNonGuiExecutable)
+
+include(KDEInstallDirs)
+include(KDECMakeSettings)
+include(KDECompilerSettings)
+
+include(ECMOptionalAddSubdirectory)
+include(ECMInstallIcons)
 
 set(CMAKE_CXX_STANDARD 11)
 
 #search packages used by KDE
-set(QT_MIN_VERSION "4.7.0")
+set(QT_MIN_VERSION "5.9.0")
 
-find_package(KDE4 4.9.4 REQUIRED)
-include(KDE4Defaults)
+# find_package(KDE4 4.9.4 REQUIRED)
+# include(KDE4Defaults)
 
 option(WITH_XINERAMA "Xinerama support for multi-headed X displays" ON)
 
 option(KDM_THEMEABLE "Build KDM with themeing support" OFF)
+
+#TODO: this was coming from KDELibs4, we need a replacement
+set(KDE_PLATFORM_PROFILE "Desktop")
+
+find_package(Qt5Core REQUIRED NO_MODULE)
+find_package(Qt5DBus REQUIRED NO_MODULE)
+# find_package(Qt5Quick REQUIRED NO_MODULE)
+find_package(Qt5Widgets REQUIRED NO_MODULE)
+# find_package(Qt5WebKitWidgets REQUIRED NO_MODULE)
+# find_package(Qt5Concurrent REQUIRED NO_MODULE)
+find_package(Qt5X11Extras REQUIRED NO_MODULE)
+# find_package(Qt5Test REQUIRED NO_MODULE)
+find_package(Qt5UiTools REQUIRED NO_MODULE)
+
+#include(ConfigureChecks.cmake)
+
+add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0)
+
+# Load the frameworks we need
+find_package(KF5 REQUIRED COMPONENTS
+    Config Auth Wallet DBusAddons
+    I18n GuiAddons ConfigWidgets IconThemes Crash
+    KIO KCMUtils Parts DocTools )
+
+# needed for set_package_properties macro
+find_package(KF5KDE4Support REQUIRED NO_MODULE)
 
 find_package(QImageBlitz)
 set_package_properties(QImageBlitz PROPERTIES DESCRIPTION "An image effects library"
@@ -77,7 +117,7 @@ add_subdirectory(cmake)
 add_subdirectory(libs)
 
 if(X11_Xau_FOUND AND X11_Xdmcp_FOUND)
-  macro_optional_add_subdirectory( kdm )
+  ecm_optional_add_subdirectory( kdm )
 else(X11_Xau_FOUND AND X11_Xdmcp_FOUND)
   message(STATUS "Xau lib or Xdmcp lib was missing. kdm will not compile")
 endif(X11_Xau_FOUND AND X11_Xdmcp_FOUND)
@@ -114,7 +154,7 @@ make_install_path_absolute(KDE4WORKSPACE_CONFIG_DIR  ${CONFIG_INSTALL_DIR})
 make_install_path_absolute(KDE4WORKSPACE_ICON_DIR    ${ICON_INSTALL_DIR})
 make_install_path_absolute(KDE4WORKSPACE_KCFG_DIR    ${KCFG_INSTALL_DIR})
 make_install_path_absolute(KDE4WORKSPACE_LOCALE_DIR  ${LOCALE_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_MIME_DIR    ${MIME_INSTALL_DIR})
+# make_install_path_absolute(KDE4WORKSPACE_MIME_DIR    ${MIME_INSTALL_DIR})
 make_install_path_absolute(KDE4WORKSPACE_SOUND_DIR   ${SOUND_INSTALL_DIR})
 make_install_path_absolute(KDE4WORKSPACE_TEMPLATES_DIR    ${TEMPLATES_INSTALL_DIR})
 make_install_path_absolute(KDE4WORKSPACE_WALLPAPER_DIR    ${WALLPAPER_INSTALL_DIR})
@@ -124,7 +164,7 @@ make_install_path_absolute(KDE4WORKSPACE_XDG_APPS_DIR        ${XDG_APPS_INSTALL_
 make_install_path_absolute(KDE4WORKSPACE_XDG_DIRECTORY_DIR   ${XDG_DIRECTORY_INSTALL_DIR})
 make_install_path_absolute(KDE4WORKSPACE_SYSCONF_DIR ${SYSCONF_INSTALL_DIR})
 make_install_path_absolute(KDE4WORKSPACE_MAN_DIR     ${MAN_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_INFO_DIR    ${INFO_INSTALL_DIR})
+# make_install_path_absolute(KDE4WORKSPACE_INFO_DIR    ${INFO_INSTALL_DIR})
 make_install_path_absolute(KDE4WORKSPACE_DBUS_INTERFACES_DIR ${DBUS_INTERFACES_INSTALL_DIR})
 make_install_path_absolute(KDE4WORKSPACE_DBUS_SERVICES_DIR   ${DBUS_SERVICES_INSTALL_DIR})
 make_install_path_absolute(KDE4WORKSPACE_SERVICES_DIR ${SERVICES_INSTALL_DIR})

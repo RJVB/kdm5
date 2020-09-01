@@ -1,4 +1,4 @@
-macro_optional_find_package(CkConnector)
+find_package(CkConnector)
 macro_bool_to_01(CKCONNECTOR_FOUND HAVE_CKCONNECTOR)
 if(CKCONNECTOR_FOUND)
   # when building with libck-connector, we also need the low-level D-Bus API
@@ -13,6 +13,7 @@ set_package_properties(CKConnector PROPERTIES DESCRIPTION "The ConsoleKit connec
 
 include(CheckCSourceRuns)
 include(CheckStructMember)
+include(MacroPushRequiredVars)
 
 check_struct_member("struct passwd" "pw_expire" "pwd.h" HAVE_STRUCT_PASSWD_PW_EXPIRE)
 check_struct_member("struct utmp" "ut_user" "utmp.h" HAVE_STRUCT_UTMP_UT_USER)

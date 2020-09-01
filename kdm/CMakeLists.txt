@@ -7,6 +7,7 @@ endif()
 install_pam_service(KDM)
 
 include(ConfigureChecks.cmake)
+include(MacroAdditionalCleanFiles)
 
 install( FILES README DESTINATION ${DATA_INSTALL_DIR}/doc/kdm )
 

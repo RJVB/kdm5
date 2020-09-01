@@ -1,3 +1,4 @@
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH} )
 include(UnixAuth)
 set_package_properties(PAM PROPERTIES DESCRIPTION "PAM Libraries"
                        URL "https://www.kernel.org/pub/linux/libs/pam/"
@@ -7,7 +8,7 @@ set_package_properties(PAM PROPERTIES DESCRIPTION "PAM Libraries"
 include(CheckTypeSize)
 include(FindPkgConfig)
 
-macro_optional_find_package(XKB) # kxkb, kdm
+find_package(XKB) # kxkb, kdm
 
 if (PAM_FOUND)
     set(KDE4_COMMON_PAM_SERVICE "kde" CACHE STRING "The PAM service to use unless overridden for a particular app.")

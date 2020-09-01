@@ -47,8 +47,9 @@ if (SECURE_RPC)
 endif (SECURE_RPC)
 macro_add_file_dependencies(dm.h ${confci})
 macro_add_file_dependencies(error.c ${CMAKE_CURRENT_SOURCE_DIR}/printf.c)
-kde4_add_executable(kdm NOGUI ${kdm_SRCS})
-macro_add_compile_flags(kdm -U_REENTRANT)
+add_executable(kdm ${kdm_SRCS})
+ecm_mark_nongui_executable(kdm)
+add_definitions(-U_REENTRANT)
 target_link_libraries( kdm
 	${X11_X11_LIB} ${X11_Xau_LIB} ${X11_Xdmcp_LIB} ${X11_X_EXTRA_LIBS}
 	${UNIXAUTH_LIBRARIES}

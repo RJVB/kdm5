@@ -30,7 +30,7 @@ if (KDM_THEMEABLE)
 endif()
 
 
-kde4_add_plugin(kcm_kdm ${kcm_kdm_PART_SRCS})
+add_library(kcm_kdm MODULE ${kcm_kdm_PART_SRCS})
 
 
 target_link_libraries(kcm_kdm ${KDE4_KIO_LIBS} ${QIMAGEBLITZ_LIBRARIES} ${KDE4_KNEWSTUFF3_LIBS} ${X11_LIBRARIES})
@@ -45,13 +45,13 @@ add_dependencies(kcm_kdm ConfigCi)
 install(TARGETS kcm_kdm  DESTINATION ${PLUGIN_INSTALL_DIR})
 
 #### KAuth helper and actions ####
-kde4_add_executable(kcmkdmhelper helper.cpp)
+add_executable(kcmkdmhelper helper.cpp)
 target_link_libraries(kcmkdmhelper ${KDE4_KDECORE_LIBS})
 install(TARGETS kcmkdmhelper DESTINATION ${LIBEXEC_INSTALL_DIR})
 
-kde4_install_auth_helper_files(kcmkdmhelper org.kde.kcontrol.kcmkdm root)
+kauth_install_helper_files(kcmkdmhelper org.kde.kcontrol.kcmkdm root)
 
-kde4_install_auth_actions(org.kde.kcontrol.kcmkdm kcmkdm_actions.actions)
+kauth_install_actions(org.kde.kcontrol.kcmkdm kcmkdm_actions.actions)
 
 ########### install files ###############
 
