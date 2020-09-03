@@ -4,6 +4,8 @@ include(CheckFunctionExists)
 include(CheckLibraryExists)
 include(CheckIncludeFiles)
 
+include(MacroPushRequiredVars)
+
 set(UNIXAUTH_LIBRARIES)
 set(UNIXAUTH_INCLUDE_DIRS)
 

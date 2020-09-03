@@ -26,21 +26,25 @@
 #include <QHash>
 #include <QPixmap>
 #include <QSvgRenderer>
+#include <QTemporaryFile>
 
-#include <kapplication.h>
 #include <kconfig.h>
-#include <kdebug.h>
+#include <kconfiggroup.h>
+
+#include <kglobal.h>
+#include <kapplication.h>
 #include <kstandarddirs.h>
 #include <qimageblitz.h>
-#include <ktemporaryfile.h>
 #include <kcursor.h>
 #include <kfilemetainfo.h>
-#include <kconfiggroup.h>
 #include <kmacroexpander.h>
 
 #include "bgdefaults.h"
 
 #include <X11/Xlib.h>
+// Clean up after X.h/Xlib.h
+#undef Bool
+#undef Unsorted
 
 #include <QX11Info>
 
@@ -315,7 +319,7 @@ wp_load:
                 break;
             case NoWallpaper:
             default:
-                kWarning() << "unknown diagram type" ;
+                qWarning() << "unknown diagram type" ;
                 svgHeight = m_Size.height();
                 svgWidth = svgHeight;
                 break;
@@ -338,7 +342,7 @@ wp_load:
             m_Wallpaper.load(file);
         }
         if (m_Wallpaper.isNull()) {
-            kWarning() << "failed to load wallpaper " << file ;
+            qWarning() << "failed to load wallpaper " << file ;
             if (discardCurrentWallpaper())
                 goto wp_load;
             wpmode = NoWallpaper;
@@ -892,7 +896,7 @@ void KBackgroundRenderer::load(int screen, bool drawBackgroundPerScreen, bool re
 void KBackgroundRenderer::createTempFile()
 {
     if (!m_Tempfile) {
-        m_Tempfile = new KTemporaryFile();
+        m_Tempfile = new QTemporaryFile();
         m_Tempfile->open();
     }
 }
@@ -968,4 +972,4 @@ void KBackgroundRenderer::saveCacheFile()
     }
 }
 
-#include "bgrender.moc"
+#include "moc_bgrender.cpp"

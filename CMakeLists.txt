@@ -4,16 +4,15 @@ project(KDM)
 cmake_minimum_required(VERSION 2.8.6 FATAL_ERROR)
 
 # Used e.g. in KDE4WorkspaceConfig.cmake, Alex
-set(KDE4WORKSPACE_VERSION_MAJOR 4)
-set(KDE4WORKSPACE_VERSION_MINOR 99)
-set(KDE4WORKSPACE_VERSION_PATCH 90)
-set(KDE4WORKSPACE_VERSION ${KDE4WORKSPACE_VERSION_MAJOR}.${KDE4WORKSPACE_VERSION_MINOR}.${KDE4WORKSPACE_VERSION_PATCH} )
+set(KDM5_VERSION_MAJOR 4)
+set(KDM5_VERSION_MINOR 99)
+set(KDM5_VERSION_PATCH 90)
+set(KDM5_VERSION ${KDM5_VERSION_MAJOR}.${KDM5_VERSION_MINOR}.${KDM5_VERSION_PATCH} )
 
 find_package(ECM 0.0.8 REQUIRED NO_MODULE)
 
 include(CMakePackageConfigHelpers)
 include(FeatureSummary)
-include(WriteBasicConfigVersionFile)
 
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
@@ -43,13 +42,11 @@ set(KDE_PLATFORM_PROFILE "Desktop")
 
 find_package(Qt5Core REQUIRED NO_MODULE)
 find_package(Qt5DBus REQUIRED NO_MODULE)
-# find_package(Qt5Quick REQUIRED NO_MODULE)
 find_package(Qt5Widgets REQUIRED NO_MODULE)
-# find_package(Qt5WebKitWidgets REQUIRED NO_MODULE)
-# find_package(Qt5Concurrent REQUIRED NO_MODULE)
+find_package(Qt5Gui REQUIRED NO_MODULE)
 find_package(Qt5X11Extras REQUIRED NO_MODULE)
-# find_package(Qt5Test REQUIRED NO_MODULE)
 find_package(Qt5UiTools REQUIRED NO_MODULE)
+find_package(Qt5Svg REQUIRED NO_MODULE)
 
 #include(ConfigureChecks.cmake)
 
@@ -57,45 +54,40 @@ add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0)
 
 # Load the frameworks we need
 find_package(KF5 REQUIRED COMPONENTS
-    Config Auth Wallet DBusAddons
-    I18n GuiAddons ConfigWidgets IconThemes Crash
-    KIO KCMUtils Parts DocTools )
+    Auth Config ConfigWidgets Crash DBusAddons DocTools 
+    GuiAddons I18n IconThemes 
+    KCMUtils KIO Parts Wallet )
 
 # needed for set_package_properties macro
 find_package(KF5KDE4Support REQUIRED NO_MODULE)
 
-find_package(QImageBlitz)
-set_package_properties(QImageBlitz PROPERTIES DESCRIPTION "An image effects library"
-                       URL "http://sourceforge.net/projects/qimageblitz"
+find_package(Q5ImageBlitz)
+set_package_properties(Q5ImageBlitz PROPERTIES DESCRIPTION "An image effects library for Qt5"
+                       URL "https://github.com/mylxiaoyi/qimageblitz"
                        TYPE REQUIRED
                       )
 
-if(Q_WS_X11)
-  find_package(XCB REQUIRED)
-  set_package_properties(XCB PROPERTIES DESCRIPTION "X protocol C-language Binding"
-                         URL "http://xcb.freedesktop.org"
-                         TYPE REQUIRED
-                        )
+find_package(XCB REQUIRED)
+set_package_properties(XCB PROPERTIES DESCRIPTION "X protocol C-language Binding"
+                     URL "http://xcb.freedesktop.org"
+                     TYPE REQUIRED
+                    )
 
-  find_package(X11_XCB)
-  set_package_properties(X11_XCB PROPERTIES DESCRIPTION "XCB X11 protocol client library"
-                         TYPE REQUIRED
-                        )
+find_package(X11_XCB)
+set_package_properties(X11_XCB PROPERTIES DESCRIPTION "XCB X11 protocol client library"
+                     TYPE REQUIRED
+                    )
 
-  find_package(X11 REQUIRED)
-  set_package_properties(X11 PROPERTIES DESCRIPTION "X11 libraries"
-                         URL "http://www.x.org"
-                         TYPE REQUIRED
-                        )
+find_package(X11 REQUIRED)
+set_package_properties(X11 PROPERTIES DESCRIPTION "X11 libraries"
+                     URL "http://www.x.org"
+                     TYPE REQUIRED
+                    )
 
-  add_feature_info("Automated testing of X clients" X11_XTest_FOUND
-                   "The X11 Testing Resource extension library is useful for automated testing of X clients")
-  add_feature_info("libXau" X11_Xau_FOUND "The X11 Authorization Protocol library may be used by KDM")
-  add_feature_info("LibXdmcp" X11_Xdmcp_FOUND "The X Display Manager Control Protocol library may be used by KDM")
-#   if(NOT X11_Xrandr_FOUND)
-#     message(FATAL_ERROR "The X11 RandR extension library was not found. Required for Multi Screen Support.")
-#   endif()
-endif(Q_WS_X11)
+add_feature_info("Automated testing of X clients" X11_XTest_FOUND
+               "The X11 Testing Resource extension library is useful for automated testing of X clients")
+add_feature_info("libXau" X11_Xau_FOUND "The X11 Authorization Protocol library may be used by KDM")
+add_feature_info("LibXdmcp" X11_Xdmcp_FOUND "The X Display Manager Control Protocol library may be used by KDM")
 
 include(ConfigureChecks.cmake)
 if(NOT WIN32)
@@ -116,11 +108,10 @@ include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES} ${K
 add_subdirectory(cmake)
 add_subdirectory(libs)
 
-if(X11_Xau_FOUND AND X11_Xdmcp_FOUND)
+# KDM doesn't actually have a hard dependency on neither Xau nor Xdmcp
+# if(X11_Xau_FOUND AND X11_Xdmcp_FOUND)
   ecm_optional_add_subdirectory( kdm )
-else(X11_Xau_FOUND AND X11_Xdmcp_FOUND)
-  message(STATUS "Xau lib or Xdmcp lib was missing. kdm will not compile")
-endif(X11_Xau_FOUND AND X11_Xdmcp_FOUND)
+# endif()
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
@@ -139,36 +130,36 @@ macro(MAKE_INSTALL_PATH_ABSOLUTE out in)
    if (IS_ABSOLUTE "${in}")    # IS_ABSOLUTE is new since cmake 2.4.8
       set(${out} "${in}")
    else (IS_ABSOLUTE "${in}")
-      set(${out} "\${KDE4WORKSPACE_INSTALL_DIR}/${in}")
+      set(${out} "\${KDM5_INSTALL_DIR}/${in}")
    endif (IS_ABSOLUTE "${in}")
 endmacro(MAKE_INSTALL_PATH_ABSOLUTE out in)
 
-make_install_path_absolute(KDE4WORKSPACE_LIB_DIR     ${LIB_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_LIBEXEC_DIR ${LIBEXEC_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_INCLUDE_DIR ${INCLUDE_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_BIN_DIR     ${BIN_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_SBIN_DIR    ${SBIN_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_DATA_DIR    ${DATA_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_HTML_DIR    ${HTML_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_CONFIG_DIR  ${CONFIG_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_ICON_DIR    ${ICON_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_KCFG_DIR    ${KCFG_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_LOCALE_DIR  ${LOCALE_INSTALL_DIR})
-# make_install_path_absolute(KDE4WORKSPACE_MIME_DIR    ${MIME_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_SOUND_DIR   ${SOUND_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_TEMPLATES_DIR    ${TEMPLATES_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_WALLPAPER_DIR    ${WALLPAPER_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_KCONF_UPDATE_DIR    ${KCONF_UPDATE_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_AUTOSTART_DIR    ${AUTOSTART_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_XDG_APPS_DIR        ${XDG_APPS_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_XDG_DIRECTORY_DIR   ${XDG_DIRECTORY_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_SYSCONF_DIR ${SYSCONF_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_MAN_DIR     ${MAN_INSTALL_DIR})
-# make_install_path_absolute(KDE4WORKSPACE_INFO_DIR    ${INFO_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_DBUS_INTERFACES_DIR ${DBUS_INTERFACES_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_DBUS_SERVICES_DIR   ${DBUS_SERVICES_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_SERVICES_DIR ${SERVICES_INSTALL_DIR})
-make_install_path_absolute(KDE4WORKSPACE_SERVICETYPES_DIR ${SERVICETYPES_INSTALL_DIR})
+make_install_path_absolute(KDM5_LIB_DIR     ${LIB_INSTALL_DIR})
+make_install_path_absolute(KDM5_LIBEXEC_DIR ${LIBEXEC_INSTALL_DIR})
+make_install_path_absolute(KDM5_INCLUDE_DIR ${INCLUDE_INSTALL_DIR})
+make_install_path_absolute(KDM5_BIN_DIR     ${BIN_INSTALL_DIR})
+make_install_path_absolute(KDM5_SBIN_DIR    ${SBIN_INSTALL_DIR})
+make_install_path_absolute(KDM5_DATA_DIR    ${DATA_INSTALL_DIR})
+make_install_path_absolute(KDM5_HTML_DIR    ${HTML_INSTALL_DIR})
+make_install_path_absolute(KDM5_CONFIG_DIR  ${CONFIG_INSTALL_DIR})
+make_install_path_absolute(KDM5_ICON_DIR    ${ICON_INSTALL_DIR})
+make_install_path_absolute(KDM5_KCFG_DIR    ${KCFG_INSTALL_DIR})
+make_install_path_absolute(KDM5_LOCALE_DIR  ${LOCALE_INSTALL_DIR})
+# make_install_path_absolute(KDM5_MIME_DIR    ${MIME_INSTALL_DIR})
+make_install_path_absolute(KDM5_SOUND_DIR   ${SOUND_INSTALL_DIR})
+make_install_path_absolute(KDM5_TEMPLATES_DIR    ${TEMPLATES_INSTALL_DIR})
+make_install_path_absolute(KDM5_WALLPAPER_DIR    ${WALLPAPER_INSTALL_DIR})
+make_install_path_absolute(KDM5_KCONF_UPDATE_DIR    ${KCONF_UPDATE_INSTALL_DIR})
+make_install_path_absolute(KDM5_AUTOSTART_DIR    ${AUTOSTART_INSTALL_DIR})
+make_install_path_absolute(KDM5_XDG_APPS_DIR        ${XDG_APPS_INSTALL_DIR})
+make_install_path_absolute(KDM5_XDG_DIRECTORY_DIR   ${XDG_DIRECTORY_INSTALL_DIR})
+make_install_path_absolute(KDM5_SYSCONF_DIR ${SYSCONF_INSTALL_DIR})
+make_install_path_absolute(KDM5_MAN_DIR     ${MAN_INSTALL_DIR})
+# make_install_path_absolute(KDM5_INFO_DIR    ${INFO_INSTALL_DIR})
+make_install_path_absolute(KDM5_DBUS_INTERFACES_DIR ${DBUS_INTERFACES_INSTALL_DIR})
+make_install_path_absolute(KDM5_DBUS_SERVICES_DIR   ${DBUS_SERVICES_INSTALL_DIR})
+make_install_path_absolute(KDM5_SERVICES_DIR ${SERVICES_INSTALL_DIR})
+make_install_path_absolute(KDM5_SERVICETYPES_DIR ${SERVICETYPES_INSTALL_DIR})
 
-set(KDE4WORKSPACE_TARGET_PREFIX KDE4Workspace__)
+set(KDM5_TARGET_PREFIX KDE4Workspace__)
 

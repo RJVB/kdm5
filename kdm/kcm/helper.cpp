@@ -29,11 +29,12 @@
 
 #include <config-workspace.h>
 
-#include <QFile>
-#include <QDir>
 #include <KConfig>
 #include <KConfigGroup>
-#include <KStandardDirs>
+
+#include <QFile>
+#include <QDir>
+#include <QStandardPaths>
 
 bool secureCopy(const QString &from, const QString &to)
 {
@@ -114,10 +115,9 @@ ActionReply Helper::createReply(int code, const QVariantMap *returnData)
     ActionReply reply;
 
     if (code) {
-        reply = ActionReply::HelperError;
-        reply.setErrorCode(code);
+        reply = ActionReply::HelperErrorReply(code);
     } else {
-        reply = ActionReply::SuccessReply;
+        reply = ActionReply::SuccessReply();
     }
 
     if (returnData)
@@ -169,7 +169,7 @@ ActionReply Helper::managefaces(const QVariantMap &args)
     QString facesDir =
         KConfig(QString::fromLatin1(KDE_CONFDIR "/kdm/kdmrc"), KConfig::SimpleConfig)
             .group("X-*-Greeter").readEntry("FaceDir",
-                QString(KStandardDirs::installPath("data") + "kdm/faces" + '/'));
+                QString(QStandardPaths::standardLocations(QStandardPaths::DataLocation).last() + "kdm/faces" + '/'));
 
     int code = 0;
 
@@ -188,7 +188,7 @@ ActionReply Helper::managefaces(const QVariantMap &args)
                 ? 0 : InstallFaceError);
         break;
     default:
-        return ActionReply::HelperError;
+        return ActionReply::HelperErrorReply();
     }
 
     return createReply(code);
@@ -248,7 +248,7 @@ bool Helper::installThemes(const QString &themesDir, QStringList &themes)
 ActionReply Helper::managethemes(const QVariantMap &args)
 {
     int subaction = args.value("subaction").toInt();
-    QString themesDir = KStandardDirs::installPath("data") + "kdm/themes/";
+    QString themesDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).last() + "kdm/themes/";
 
     int code = 0;
 
@@ -273,8 +273,10 @@ ActionReply Helper::managethemes(const QVariantMap &args)
         return createReply(code, &returnData);
     }
     default:
-        return ActionReply::HelperError;
+        return ActionReply::HelperErrorReply();
     }
 }
 
-KDE4_AUTH_HELPER_MAIN("org.kde.kcontrol.kcmkdm", Helper)
+KAUTH_HELPER_MAIN("org.kde.kcontrol.kcmkdm", Helper)
+
+#include "moc_helper.cpp"

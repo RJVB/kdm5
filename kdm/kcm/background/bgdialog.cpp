@@ -30,27 +30,32 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QTimer>
-
-
 #include <QApplication>
 #include <QPixmap>
 #include <QDesktopWidget>
+#include <QStandardPaths>
+#include <QFontDatabase>
+#include <QFileInfo>
+#include <QMimeType>
+#include <QMimeDatabase>
+#include <QImageReader>
 
 #include <kconfig.h>
-#include <kdebug.h>
-#include <kfiledialog.h>
-#include <kfilemetainfo.h>
-#include <kglobal.h>
 #include <kiconloader.h>
-#include <kimageio.h>
-#include <klocale.h>
-#include <kstandarddirs.h>
+#include <klocalizedstring.h>
 #include <kstringhandler.h>
 #include <kurlrequester.h>
 #include <kwindowsystem.h>
 #include <kdesktopfile.h>
 #include <kimagefilepreview.h>
+
+// #include <kdebug.h>
+#include <kfilemetainfo.h>
+#include <kglobal.h>
+#include <kstandarddirs.h>
+#ifdef KDM_THEMEABLE
 #include <knewstuff3/downloaddialog.h>
+#endif
 
 #include <stdlib.h>
 
@@ -69,7 +74,6 @@ BGDialog::BGDialog(QWidget *parent, const KSharedConfigPtr &_config)
     : BGDialog_UI(parent), m_readOnly(false)
 {
     m_pGlobals = new KGlobalBackgroundSettings(_config);
-    m_pDirs = KGlobal::dirs();
     m_previewUpdates = true;
 
     m_numScreens = QApplication::desktop()->numScreens();
@@ -104,7 +108,7 @@ BGDialog::BGDialog(QWidget *parent, const KSharedConfigPtr &_config)
     }
 
     // background image settings
-    QIcon iconSet = KIcon(QLatin1String("document-open"));
+    QIcon iconSet = QIcon(QStringLiteral("document-open"));
     QPixmap pixMap = iconSet.pixmap(
              style()->pixelMetric(QStyle::PM_SmallIconSize), QIcon::Normal);
     m_urlWallpaperButton->setIcon(iconSet);
@@ -181,11 +185,11 @@ BGDialog::BGDialog(QWidget *parent, const KSharedConfigPtr &_config)
     if (m_wallpaperPos == KBackgroundSettings::NoWallpaper)
         m_wallpaperPos = KBackgroundSettings::Centred; // Default
 
-    if (KGlobal::dirs()->isRestrictedResource("wallpaper")) {
-        m_urlWallpaperButton->hide();
-        m_buttonSetupWallpapers->hide();
-        m_radioSlideShow->hide();
-    }
+//     if (KGlobal::dirs()->isRestrictedResource("wallpaper")) {
+//         m_urlWallpaperButton->hide();
+//         m_buttonSetupWallpapers->hide();
+//         m_radioSlideShow->hide();
+//     }
 
     initUI();
     updateUI();
@@ -358,7 +362,7 @@ void BGDialog::slotIdentifyScreens()
         QLabel *screenLabel = new QLabel(0, Qt::X11BypassWindowManagerHint);
         screenLabel->setObjectName("Screen Identify");
 
-        QFont identifyFont(KGlobalSettings::generalFont());
+        QFont identifyFont(QFontDatabase::systemFont(QFontDatabase::GeneralFont));
         identifyFont.setPixelSize(100);
         screenLabel->setFont(identifyFont);
 
@@ -437,9 +441,11 @@ void BGDialog::loadWallpaperFilesList()
     // the following QMap is lower cased names mapped to cased names and URLs
     // this way we get case insensitive sorting
     QMap<QString, QPair<QString, QString> > papers;
+    const auto pDirs = KGlobal::dirs();
 
     //search for .desktop files before searching for images without .desktop files
-    QStringList lst = m_pDirs->findAllResources("wallpaper", "*desktop", KStandardDirs::NoDuplicates);
+    //QSP doesn't have an equivalent of findAllResources() so we'll use KStandardDirs here for the time being.
+    QStringList lst = pDirs->findAllResources("wallpaper", "*desktop", KStandardDirs::NoDuplicates);
     QStringList files;
     for (QStringList::ConstIterator it = lst.constBegin(); it != lst.constEnd(); ++it) {
         KDesktopFile fileConfig(*it);
@@ -470,7 +476,7 @@ void BGDialog::loadWallpaperFilesList()
     }
 
     //now find any wallpapers that don't have a .desktop file
-    lst = m_pDirs->findAllResources("wallpaper", "*", KStandardDirs::NoDuplicates);
+    lst = pDirs->findAllResources("wallpaper", "*", KStandardDirs::NoDuplicates);
     for (QStringList::ConstIterator it = lst.constBegin(); it != lst.constEnd(); ++it) {
         if (!(*it).endsWith(".desktop") && files.filter(*it).empty()) {
             // First try to see if we have a comment describing the image.  If we do
@@ -552,17 +558,12 @@ void BGDialog::setWallpaper(const QString &s)
 
 void BGDialog::slotWallpaperSelection()
 {
-    KUrl u;
-    KFileDialog dlg(u, QString(), this);
+    QFileDialog dlg(this, i18n("Select Wallpaper"));
 
-    KImageFilePreview *previewWidget = new KImageFilePreview(&dlg);
-    dlg.setPreviewWidget(previewWidget);
-
-    QStringList mimeTypes = KImageIO::mimeTypes(KImageIO::Reading);
+    QStringList mimeTypes = QString(QImageReader::supportedMimeTypes().join(';')).split(';');
     mimeTypes += "image/svg+xml";
-    dlg.setFilter(mimeTypes.join(" "));
-    dlg.setMode(KFile::File | KFile::ExistingOnly | KFile::LocalOnly);
-    dlg.setCaption(i18n("Select Wallpaper"));
+    dlg.setMimeTypeFilters(mimeTypes);
+    dlg.setFileMode(QFileDialog::ExistingFile);
 
     int j = m_urlWallpaperBox->currentIndex();
     QString uri;
@@ -576,11 +577,11 @@ void BGDialog::slotWallpaperSelection()
     }
 
     if (!uri.isEmpty()) {
-        dlg.setSelection(uri);
+        dlg.selectFile(uri);
     }
 
     if (dlg.exec() == QDialog::Accepted) {
-        setWallpaper(dlg.selectedFile());
+        setWallpaper(dlg.selectedFiles().first());
 
         int optionID = m_buttonGroupBackground->id(m_radioPicture);
         m_buttonGroupBackground->setSelected(optionID);
@@ -832,7 +833,7 @@ void BGDialog::slotWallpaperTypeChanged(int i)
                 m_wallpaperPos = KBackgroundSettings::Scaled;
             else
                 m_wallpaperPos = KBackgroundSettings::Tiled;
-        } else if (KMimeType::findByPath(path)->is("image/svg+xml")) {
+        } else if (QMimeDatabase().mimeTypeForFile(QFileInfo(path)).inherits("image/svg+xml")) {
             m_wallpaperPos = KBackgroundSettings::Scaled;
         }
 
@@ -1037,6 +1038,7 @@ void BGDialog::slotAdvanced()
 
 void BGDialog::slotGetNewStuff()
 {
+#ifdef KDM_THEMEABLE
     // We use the more complicated KNewStuff2 API here because these settings
     // might affect both kcmshell and kcontrol
 
@@ -1048,6 +1050,7 @@ void BGDialog::slotGetNewStuff()
     // FIXME (KNS2): engine->download gives us meta infos, write those into
     // the .desktop files
     loadWallpaperFilesList();
+#endif
 }
 
 void BGDialog::slotBlendMode(int mode)
@@ -1102,4 +1105,4 @@ void BGDialog::desktopResized()
     eRenderer()->start(true);
 }
 
-#include "bgdialog.moc"
+#include "moc_bgdialog.cpp"

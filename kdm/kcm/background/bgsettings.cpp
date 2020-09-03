@@ -18,15 +18,15 @@
 
 #include <QDir>
 #include <QPixmap>
-//Added by qt3to4:
 
-#include <kapplication.h>
-#include <kdebug.h>
-#include <KColorScheme>
 #include <kdesktopfile.h>
 #include <kconfiggroup.h>
-#include <kstandarddirs.h>
+#include <kcolorscheme.h>
 #include <krandomsequence.h>
+
+#include <kglobal.h>
+#include <kapplication.h>
+#include <kstandarddirs.h>
 
 #include "bgdefaults.h"
 #include "bgsettings.h"

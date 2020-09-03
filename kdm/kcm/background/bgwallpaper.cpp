@@ -24,12 +24,13 @@
 
 #include <QCheckBox>
 #include <QPushButton>
+#include <QFileDialog>
+#include <QImageReader>
 
-#include <kfiledialog.h>
-#include <kimageio.h>
-#include <klocale.h>
+#include <klocalizedstring.h>
+
+#include <kglobal.h>
 #include <kstandarddirs.h>
-#include <kurl.h>
 
 #include "bgsettings.h"
 #include "bgwallpaper.h"
@@ -56,15 +57,16 @@ BGMultiWallpaperList::BGMultiWallpaperList(QWidget *parent, const char *name)
 
 void BGMultiWallpaperList::dragEnterEvent(QDragEnterEvent *ev)
 {
-    ev->setAccepted(KUrl::List::canDecode(ev->mimeData()));
+    ev->setAccepted(ev->mimeData()->hasUrls());
 }
 
 
 void BGMultiWallpaperList::dropEvent(QDropEvent *ev)
 {
     QStringList files;
-    const KUrl::List urls(KUrl::List::fromMimeData(ev->mimeData()));
-    for (KUrl::List::ConstIterator it = urls.constBegin();
+    const auto kk = ev->mimeData();
+    const auto urls = ev->mimeData()->urls();
+    for (auto it = urls.constBegin();
             it != urls.constEnd(); ++it) {
         // TODO: Download remote files
         if ((*it).isLocalFile())
@@ -154,19 +156,14 @@ void BGMultiWallpaperDialog::setEnabledMoveButtons()
 
 void BGMultiWallpaperDialog::slotAdd()
 {
-    QStringList mimeTypes = KImageIO::mimeTypes(KImageIO::Reading);
+    QStringList mimeTypes = QString(QImageReader::supportedMimeTypes().join(';')).split(';');
     mimeTypes += "image/svg+xml";
 
     QStringList lstWallpaper = KGlobal::dirs()->findDirs("wallpaper", "");
-    KFileDialog fileDialog((lstWallpaper.count() > 0) ? lstWallpaper.first() : QString(),
-                           mimeTypes.join(" "), this);
-
-    fileDialog.setCaption(i18n("Select Image"));
-    KFile::Modes mode = KFile::Files |
-                        KFile::Directory |
-                        KFile::ExistingOnly |
-                        KFile::LocalOnly;
-    fileDialog.setMode(mode);
+    QFileDialog fileDialog(this, i18n("Select Image")
+        , (lstWallpaper.count() > 0) ? lstWallpaper.first() : QString()
+        , mimeTypes.join(";"));
+    fileDialog.setFileMode(QFileDialog::ExistingFiles);
     fileDialog.exec();
     QStringList files = fileDialog.selectedFiles();
     if (files.isEmpty())
@@ -236,4 +233,4 @@ void BGMultiWallpaperDialog::slotOk()
     KDialog::accept();
 }
 
-#include "bgwallpaper.moc"
+#include "moc_bgwallpaper.cpp"

@@ -88,7 +88,6 @@ protected Q_SLOTS:
 protected:
     void getEScreen();
     KGlobalBackgroundSettings *m_pGlobals;
-    KStandardDirs *m_pDirs;
 
     unsigned m_numScreens;
     int m_screen;

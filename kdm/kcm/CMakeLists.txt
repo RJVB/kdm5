@@ -9,7 +9,7 @@ set(kcmbackgroundlib_SRCS
     background/bgmonitor.cpp
     background/bgwallpaper.cpp
 )
-kde4_add_ui_files(kcmbackgroundlib_SRCS
+ki18n_wrap_ui(kcmbackgroundlib_SRCS
     background/bgwallpaper_ui.ui
     background/bgdialog_ui.ui
     background/bgadvanced_ui.ui)
@@ -33,9 +33,12 @@ endif()
 add_library(kcm_kdm MODULE ${kcm_kdm_PART_SRCS})
 
 
-target_link_libraries(kcm_kdm ${KDE4_KIO_LIBS} ${QIMAGEBLITZ_LIBRARIES} ${KDE4_KNEWSTUFF3_LIBS} ${X11_LIBRARIES})
+target_link_libraries(kcm_kdm ${KDE4_KIO_LIBS} ${QIMAGEBLITZ_LIBRARIES}
+    KF5::AuthCore KF5::CoreAddons KF5::ConfigCore KF5::ConfigWidgets KF5::I18n KF5::WidgetsAddons
+    Qt5::Core Qt5::Widgets Qt5::Svg Qt5::X11Extras
+    ${X11_LIBRARIES})
 if (KDM_THEMEABLE)
-    target_link_libraries(kcm_kdm kworkspace)
+    target_link_libraries(kcm_kdm ${KDE4_KNEWSTUFF3_LIBS} kworkspace)
 endif()
 
 
@@ -46,8 +49,10 @@ install(TARGETS kcm_kdm  DESTINATION ${PLUGIN_INSTALL_DIR})
 
 #### KAuth helper and actions ####
 add_executable(kcmkdmhelper helper.cpp)
-target_link_libraries(kcmkdmhelper ${KDE4_KDECORE_LIBS})
-install(TARGETS kcmkdmhelper DESTINATION ${LIBEXEC_INSTALL_DIR})
+target_link_libraries(kcmkdmhelper
+    KF5::AuthCore KF5::ConfigCore
+    Qt5::Core)
+install(TARGETS kcmkdmhelper DESTINATION ${KAUTH_HELPER_INSTALL_DIR})
 
 kauth_install_helper_files(kcmkdmhelper org.kde.kcontrol.kcmkdm root)
 

@@ -363,4 +363,4 @@ void KDMConvenienceWidget::slotDelUsers(const QMap<QString, int> &users)
     }
 }
 
-#include "kdm-conv.moc"
+#include "moc_kdm-conv.cpp"

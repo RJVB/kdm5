@@ -456,4 +456,4 @@ void KProgramEditDialog::accept()
 }
 #endif
 
-#include "bgadvanced.moc"
+#include "moc_bgadvanced.cpp"

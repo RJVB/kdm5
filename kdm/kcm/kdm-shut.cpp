@@ -199,8 +199,8 @@ void KDMSessionsWidget::load()
 
 void KDMSessionsWidget::defaults()
 {
-    restart_lined->setUrl(KUrl(REBOOT_CMD));
-    shutdown_lined->setUrl(KUrl(HALT_CMD));
+    restart_lined->setUrl(QUrl(REBOOT_CMD));
+    shutdown_lined->setUrl(QUrl(HALT_CMD));
 
     sdlcombo->setCurrentIndex(SdAll);
     sdrcombo->setCurrentIndex(SdRoot);
@@ -208,4 +208,4 @@ void KDMSessionsWidget::defaults()
     bm_combo->setCurrentId("None");
 }
 
-#include "kdm-shut.moc"
+#include "moc_kdm-shut.cpp"

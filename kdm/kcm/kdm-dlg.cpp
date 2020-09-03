@@ -21,8 +21,6 @@
 
 #include "positioner.h"
 
-#include <KDialog>
-#include <KFileDialog>
 #include <KIconLoader>
 #include <KImageFilePreview>
 #include <KImageIO>
@@ -31,9 +29,13 @@
 #include <KMessageBox>
 #include <KConfig>
 #include <KConfigGroup>
-#include <KStandardDirs>
 #include <KIO/NetAccess>
 
+#include <QMimeData>
+#include <QImageReader>
+#include <QStandardPaths>
+
+#include <QFileDialog>
 #include <QButtonGroup>
 #include <QDragEnterEvent>
 #include <QEvent>
@@ -53,12 +55,9 @@ KDMDialogWidget::KDMDialogWidget(QWidget *parent)
     QString wtstr;
 
     QGridLayout *grid = new QGridLayout(this);
-    grid->setMargin(KDialog::marginHint());
-    grid->setSpacing(KDialog::spacingHint());
     grid->setColumnStretch(1, 1);
 
     QHBoxLayout *hlay = new QHBoxLayout();
-    hlay->setSpacing(KDialog::spacingHint());
     grid->addLayout(hlay, 0, 0, 1, 2);
     greetstr_lined = new KLineEdit(this);
     QLabel *label = new QLabel(i18n("&Greeting:"), this);
@@ -86,13 +85,11 @@ KDMDialogWidget::KDMDialogWidget(QWidget *parent)
 
 
     QGridLayout *hglay = new QGridLayout();
-    hglay->setSpacing(KDialog::spacingHint());
     grid->addLayout(hglay, 1, 0);
 
     label = new QLabel(i18n("Logo area:"), this);
     hglay->addWidget(label, 0, 0);
     QVBoxLayout *vlay = new QVBoxLayout();
-    vlay->setSpacing(KDialog::spacingHint());
     hglay->addLayout(vlay, 0, 1, 1, 2);
     noneRadio = new QRadioButton(i18nc("logo area", "&None"), this);
     clockRadio = new QRadioButton(i18n("Show cloc&k"), this);
@@ -149,7 +146,7 @@ KDMDialogWidget::KDMDialogWidget(QWidget *parent)
 bool KDMDialogWidget::setLogo(const QString &logo)
 {
     QString flogo = logo.isEmpty() ?
-        KStandardDirs::locate("data", QLatin1String("kdm/pics/kdelogo.png")) :
+        QStandardPaths::locate(QStandardPaths::GenericDataLocation, QStringLiteral("kdm/pics/kdelogo.png")) :
         logo;
     QImage p(flogo);
     if (p.isNull())
@@ -165,16 +162,16 @@ bool KDMDialogWidget::setLogo(const QString &logo)
 
 void KDMDialogWidget::slotLogoButtonClicked()
 {
-    KFileDialog dialog(KStandardDirs::locate("data", QLatin1String("kdm/pics/")),
-                       KImageIO::pattern(KImageIO::Reading),
-                       this);
-    dialog.setOperationMode(KFileDialog::Opening);
-    dialog.setMode(KFile::File | KFile::LocalOnly);
+    QFileDialog dialog(this, i18n("Select Logo"),
+        QStandardPaths::locate(QStandardPaths::GenericDataLocation, QStringLiteral("kdm/pics/kdelogo.png"),
+                               QStandardPaths::LocateDirectory));
+    QStringList mimeTypes = QString(QImageReader::supportedMimeTypes().join(';')).split(';');
+    mimeTypes += "image/svg+xml";
+    dialog.setMimeTypeFilters(mimeTypes);
+    dialog.setFileMode(QFileDialog::ExistingFile);
 
-    KImageFilePreview *imagePreview = new KImageFilePreview(&dialog);
-    dialog.setPreviewWidget(imagePreview);
     if (dialog.exec() == QDialog::Accepted &&
-            setLogo(dialog.selectedFile()))
+            setLogo(dialog.selectedFiles().first()))
         changed();
 }
 
@@ -203,11 +200,11 @@ bool KDMDialogWidget::eventFilter(QObject *, QEvent *e)
 
 void KDMDialogWidget::iconLoaderDragEnterEvent(QDragEnterEvent *e)
 {
-    e->setAccepted(KUrl::List::canDecode(e->mimeData()));
+    e->setAccepted(e->mimeData()->hasUrls());
 }
 
 
-KUrl *decodeImgDrop(QDropEvent *e, QWidget *wdg);
+QUrl *decodeImgDrop(QDropEvent *e, QWidget *wdg);
 
 void KDMDialogWidget::iconLoaderDropEvent(QDropEvent *e)
 {
@@ -215,7 +212,7 @@ void KDMDialogWidget::iconLoaderDropEvent(QDropEvent *e)
     // such a prominent feature to introduce a new KAuth action
     // for it. So let us just ignore these drops.
 
-    KUrl *url = decodeImgDrop(e, this);
+    QUrl *url = decodeImgDrop(e, this);
     if (url && url->isLocalFile()) {
         if (!setLogo(url->toLocalFile())) {
             QString msg = i18n("There was an error loading the image:\n"
@@ -296,4 +293,4 @@ QString KDMDialogWidget::quickHelp() const
         "the KDM login manager in dialog mode, i.e. a greeting string, an icon etc.");
 }
 
-#include "kdm-dlg.moc"
+#include "moc_kdm-dlg.cpp"

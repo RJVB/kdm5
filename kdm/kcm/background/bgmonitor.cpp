@@ -166,4 +166,4 @@ void BGMonitorArrangement::setPixmap(const QPixmap &pm)
 }
 //END class BGMonitorArrangement
 
-#include "bgmonitor.moc"
+#include "moc_bgmonitor.cpp"

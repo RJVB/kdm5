@@ -21,7 +21,6 @@
 
 #include "helper.h"
 
-#include <KUrl>
 #include <KComboBox>
 #include <KIconDialog>
 #include <KLineEdit>
@@ -60,21 +59,21 @@
 
 extern KConfig *config;
 
-extern int handleActionReply(QWidget *parent, const KAuth::ActionReply &reply);
+extern int handleKauthActionJob(QWidget *parent, KAuth::ExecuteJob *j, QVariantMap *returnedData = 0);
 
 static int executeFaceAction(QWidget *parent, const QVariantMap &helperargs)
 {
     parent->setEnabled(false);
 
-    KAuth::Action action("org.kde.kcontrol.kcmkdm.managefaces");
-    action.setHelperID("org.kde.kcontrol.kcmkdm");
+    KAuth::Action action(QStringLiteral("org.kde.kcontrol.kcmkdm.managefaces"));
+    action.setHelperId(QStringLiteral("org.kde.kcontrol.kcmkdm"));
     action.setArguments(helperargs);
 
-    KAuth::ActionReply reply = action.execute();
+    auto job = action.execute();
 
     parent->setEnabled(true);
 
-    return handleActionReply(parent, reply);
+    return handleKauthActionJob(parent, job);
 }
 
 KDMUsersWidget::KDMUsersWidget(QWidget *parent)
@@ -253,7 +252,7 @@ KDMUsersWidget::KDMUsersWidget(QWidget *parent)
     connect(rstuserbutton, SIGNAL(clicked()),
             SLOT(slotUnsetUserPix()));
     QGridLayout *hlpl = new QGridLayout(picGroup);
-    hlpl->setSpacing(KDialog::spacingHint());
+//     hlpl->setSpacing(KDialog::spacingHint());
     hlpl->addWidget(userlabel, 0, 0);
     hlpl->addWidget(usercombo, 0, 1); // XXX this makes the layout too wide
     hlpl->addWidget(userbutton, 1, 0, 1, 2, Qt::AlignHCenter);
@@ -415,7 +414,7 @@ bool KDMUsersWidget::eventFilter(QObject *, QEvent *e)
 {
     if (e->type() == QEvent::DragEnter) {
         QDragEnterEvent *ee = (QDragEnterEvent *)e;
-        ee->setAccepted(KUrl::List::canDecode(ee->mimeData()));
+        ee->setAccepted(ee->mimeData()->hasUrls());
         return true;
     }
 
@@ -427,11 +426,11 @@ bool KDMUsersWidget::eventFilter(QObject *, QEvent *e)
     return false;
 }
 
-KUrl *decodeImgDrop(QDropEvent *e, QWidget *wdg);
+QUrl *decodeImgDrop(QDropEvent *e, QWidget *wdg);
 
 void KDMUsersWidget::userButtonDropEvent(QDropEvent *e)
 {
-    KUrl *url = decodeImgDrop(e, this);
+    QUrl *url = decodeImgDrop(e, this);
     if (url) {
         QString pixpath;
         KIO::NetAccess::download(*url, pixpath, parentWidget());
@@ -580,4 +579,4 @@ void KDMUsersWidget::slotMinMaxChanged()
     emit setMinMaxUID(leminuid->text().toInt(), lemaxuid->text().toInt());
 }
 
-#include "kdm-users.moc"
+#include "moc_kdm-users.cpp"

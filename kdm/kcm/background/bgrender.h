@@ -24,7 +24,7 @@ class QRect;
 class QString;
 class QTimer;
 
-class KTemporaryFile;
+class QTemporaryFile;
 class KStandardDirs;
 
 /**
@@ -100,7 +100,7 @@ private:
     bool m_Cached;
     bool m_TilingEnabled;
 
-    KTemporaryFile *m_Tempfile;
+    QTemporaryFile *m_Tempfile;
     QSize m_Size, m_rSize;
     QRect m_WallpaperRect;
     QImage m_Image, m_Background, m_Wallpaper;

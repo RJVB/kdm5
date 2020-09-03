@@ -139,3 +139,5 @@
 /* Parameters to get from bindir to libexecdir */
 #cmakedefine KDM_LIBEXEC_STRIP ${KDM_LIBEXEC_STRIP}
 #cmakedefine KDM_LIBEXEC_SUFFIX "${KDM_LIBEXEC_SUFFIX}/"
+
+#cmakedefine KDM5_VERSION "${KDM5_VERSION}"

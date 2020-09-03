@@ -64,7 +64,7 @@ class ThemeData : public QTreeWidgetItem {
     QString description;
 };
 
-extern int handleActionReply(QWidget *parent, const KAuth::ActionReply &reply);
+extern int handleKauthActionJob(QWidget *parent, KAuth::ExecuteJob *j, QVariantMap *returnedData = 0);
 
 static int executeThemeAction(QWidget *parent,
         const QVariantMap &helperargs, QVariantMap *returnedData = 0)
@@ -72,17 +72,14 @@ static int executeThemeAction(QWidget *parent,
     parent->setEnabled(false);
 
     KAuth::Action action("org.kde.kcontrol.kcmkdm.managethemes");
-    action.setHelperID("org.kde.kcontrol.kcmkdm");
+    action.setHelperId("org.kde.kcontrol.kcmkdm");
     action.setArguments(helperargs);
 
-    KAuth::ActionReply reply = action.execute();
+    auto job = action.execute();
 
     parent->setEnabled(true);
 
-    if (returnedData)
-        *returnedData = reply.data();
-
-    return handleActionReply(parent, reply);
+    return handleKauthActionJob(parent, job, returnedData);
 }
 
 KDMThemeWidget::KDMThemeWidget(QWidget *parent)
@@ -406,4 +403,4 @@ void KDMThemeWidget::getNewStuff()
     }
 }
 
-#include "kdm-theme.moc"
+#include "moc_kdm-theme.cpp"

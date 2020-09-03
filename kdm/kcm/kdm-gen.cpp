@@ -21,13 +21,14 @@
 
 #include "kbackedcombobox.h"
 
-#include <KDialog>
-#include <KFontRequester>
-#include <KLocale>
-#include <KConfig>
-#include <KConfigGroup>
-#include <KStandardDirs>
-#include <KLanguageButton>
+#include <klocalizedstring.h>
+#include <kconfig.h>
+#include <kconfiggroup.h>
+#include <kfontrequester.h>
+
+#include <kglobal.h>
+#include <kstandarddirs.h>
+#include <klanguagebutton.h>
 
 #include <QCheckBox>
 #include <QGroupBox>
@@ -100,7 +101,7 @@ KDMGeneralWidget::KDMGeneralWidget(QWidget *parent)
     colcombo->setWhatsThis(wtstr);
 
     box = new QGroupBox(i18nc("@title:group", "Fonts"), this);
-    mlml->addSpacing(KDialog::spacingHint());
+//     mlml->addSpacing(KDialog::spacingHint());
     mlml->addWidget(box);
     fl = new QFormLayout(box);
 
@@ -251,4 +252,4 @@ void KDMGeneralWidget::slotUseThemeChanged()
 #endif
 }
 
-#include "kdm-gen.moc"
+#include "moc_kdm-gen.cpp"

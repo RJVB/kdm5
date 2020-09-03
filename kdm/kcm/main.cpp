@@ -24,6 +24,7 @@
 #include "main.h"
 
 #include <config-workspace.h>
+#include <config-kdm.h>
 
 #include "background.h"
 #include "kdm-gen.h"
@@ -36,18 +37,20 @@
 #include "helper.h"
 
 #include <kaboutdata.h>
-#include <kimageio.h>
-#include <klocale.h>
+#include <klocalizedstring.h>
 #include <kmessagebox.h>
-#include <kdebug.h>
-#include <kmimetype.h>
-#include <ktemporaryfile.h>
 #include <kconfig.h>
 #include <kpluginfactory.h>
 #include <kpluginloader.h>
 
-#include <QDropEvent>
+#include <QDebug>
+#include <QTemporaryFile>
 #include <QFile>
+#include <QMimeData>
+#include <QMimeType>
+#include <QMimeDatabase>
+#include <QImageReader>
+#include <QDropEvent>
 #include <QLabel>
 #include <QStackedWidget>
 #include <QTabWidget>
@@ -61,42 +64,45 @@
 
 
 K_PLUGIN_FACTORY(KDMFactory, registerPlugin<KDModule>();)
-K_EXPORT_PLUGIN(KDMFactory("kdmconfig"))
 
-int handleActionReply(QWidget *parent, const KAuth::ActionReply &reply)
+int handleKauthActionJob(QWidget *parent, KAuth::ExecuteJob *j, QVariantMap *returnedData = 0)
 {
     int code = 0;
+    // for now until we figure out how to get the ActionReply
+    Q_UNUSED(returnedData);
 
-    if (reply.failed()) {
-        if (reply.type() == ActionReply::KAuthError)
-            KMessageBox::error(parent,
-                i18n("Unable to authenticate/execute the action: %1 (code %2)",
-                     reply.errorDescription(), reply.errorCode()));
-        else
-            code = reply.errorCode();
+    if (!j->exec()) {
+        if (j->error() == KAuth::ActionReply::AuthorizationDeniedError) {
+            KMessageBox::error(parent, i18n("Permission denied."), i18n("KDM Control Module"));
+        } else {
+            code = j->error();
+            KMessageBox::error(parent, i18n("Error while authenticating action:\n%1 (code %2)", j->errorString(), code),
+                               i18n("KDM Control Module"));
+        }
     }
 
     return code;
 }
 
-KUrl *decodeImgDrop(QDropEvent *e, QWidget *wdg)
+QUrl *decodeImgDrop(QDropEvent *e, QWidget *wdg)
 {
-    KUrl::List uriList = KUrl::List::fromMimeData(e->mimeData());
+    auto uriList = e->mimeData()->urls();
     if (!uriList.isEmpty()) {
-        KUrl *url = new KUrl(uriList.first());
+        QUrl *url = new QUrl(uriList.first());
 
-        KMimeType::Ptr mime = KMimeType::findByUrl(*url);
-        if (mime && KImageIO::isSupported(mime->name(), KImageIO::Reading))
+        const auto mime = QMimeDatabase().mimeTypeForUrl(*url);
+        if (QImageReader::supportedMimeTypes().contains(mime.name().toLatin1())) {
             return url;
+        }
 
-        QStringList qs = KImageIO::pattern().split('\n');
+        auto qs = QImageReader::supportedImageFormats();
         qs.removeFirst();
 
         QString msg = i18n(
             "%1 does not appear to be an image file.\n"
             "Please use files with these extensions:\n"
             "%2",
-            url->fileName(), qs.join("\n"));
+            url->fileName(), QString(qs.join("\n")));
         KMessageBox::sorry(wdg, msg);
         delete url;
     }
@@ -105,23 +111,25 @@ KUrl *decodeImgDrop(QDropEvent *e, QWidget *wdg)
 
 KConfig *config;
 
-KDModule::KDModule(QWidget *parent, const QVariantList &)
-    : KCModule(KDMFactory::componentData(), parent)
+KDModule::KDModule(QWidget *parent, const QVariantList &args)
+    : KCModule(parent, args)
     , minshowuid(0)
     , maxshowuid(0)
     , updateOK(false)
 {
     KAboutData *about =
-        new KAboutData("kcmkdm", "kdmconfig", ki18n("KDE Login Manager Config Module"),
-                       QByteArray(), KLocalizedString(), KAboutData::License_GPL,
-                       ki18n("(c) 1996-2010 The KDM Authors"), KLocalizedString(),
-                       "http://developer.kde.org/~ossi/sw/kdm.html");
+        new KAboutData(QStringLiteral("kcmkdm"), QStringLiteral("kdmconfig"),
+                       QStringLiteral(KDM5_VERSION), i18n("KDE Login Manager Config Module"),
+                       KAboutLicense::GPL,
+                       i18n("(c) 1996-2010 The KDM Authors"), QString(),
+                       QStringLiteral("http://developer.kde.org/~ossi/sw/kdm.html"));
 
-    about->addAuthor(ki18n("Thomas Tanghus"), ki18n("Original author"), "tanghus@earthling.net");
-    about->addAuthor(ki18n("Steffen Hansen"), KLocalizedString(), "hansen@kde.org");
-    about->addAuthor(ki18n("Oswald Buddenhagen"), ki18n("Current maintainer"), "ossi@kde.org");
-    about->addAuthor(ki18n("Stephen Leaf"), KLocalizedString(), "smileaf@smileaf.org");
-    about->addAuthor(ki18n("Igor Krivenko"), KLocalizedString(), "igor@shg.ru");
+    about->addAuthor(i18n("Thomas Tanghus"), i18n("Original author"), "tanghus@earthling.net");
+    about->addAuthor(i18n("Steffen Hansen"), QString(), "hansen@kde.org");
+    about->addAuthor(i18n("Oswald Buddenhagen"), i18n("Previous maintainer"), "ossi@kde.org");
+    about->addAuthor(i18n("Stephen Leaf"), QString(), "smileaf@smileaf.org");
+    about->addAuthor(i18n("Igor Krivenko"), QString(), "igor@shg.ru");
+    about->addAuthor(i18n("R.J.V. Bertin"), i18n("Porting to Qt5/KF5"), "rjvbertin@gmail.com");
 
     setQuickHelp(i18n(
         "<h1>Login Manager</h1> In this module you can configure the "
@@ -147,10 +155,11 @@ KDModule::KDModule(QWidget *parent, const QVariantList &)
         "Note that by their nature, these settings are security holes, so use them very carefully."));
 
     setAboutData(about);
+    setNeedsAuthorization(true);
 
     setlocale(LC_COLLATE, "C");
 
-    KGlobal::locale()->insertCatalog("kcmbackground");
+    KLocalizedString::setApplicationDomain("kcmbackground");
 
     QStringList sl;
     QMap<gid_t, QStringList> tgmap;
@@ -193,13 +202,13 @@ KDModule::KDModule(QWidget *parent, const QVariantList &)
                 if (!(*umapi).second.contains(gn))
                     (*umapi).second.append(gn);
             } else
-                kWarning() << "group '" << gn << "' contains unknown user '" << un << "'" ;
+                qWarning() << "group '" << gn << "' contains unknown user '" << un << "'" ;
         } while (*++grp->gr_mem);
     }
     endgrent();
 
     for (tgmapci = tgmap.constBegin(); tgmapci != tgmap.constEnd(); ++tgmapci)
-        kWarning() << "user(s) '" << tgmapci.value().join(",")
+        qWarning() << "user(s) '" << tgmapci.value().join(",")
                    << "' have unknown GID " << tgmapci.key() << endl;
 
     config = createTempConfig();
@@ -279,7 +288,7 @@ KDModule::KDModule(QWidget *parent, const QVariantList &)
 
 KConfig *KDModule::createTempConfig()
 {
-    pTempConfigFile = new KTemporaryFile;
+    pTempConfigFile = new QTemporaryFile;
     pTempConfigFile->open();
     QString tempConfigName = pTempConfigFile->fileName();
 
@@ -297,7 +306,7 @@ KConfig *KDModule::createTempConfig()
 
 KSharedConfigPtr KDModule::createBackgroundTempConfig()
 {
-    pBackgroundTempConfigFile = new KTemporaryFile;
+    pBackgroundTempConfigFile = new QTemporaryFile;
     pBackgroundTempConfigFile->open();
     QString tempBackgroundConfigName = pBackgroundTempConfigFile->fileName();
 
@@ -357,27 +366,31 @@ void KDModule::save()
     helperargs["tempkdmrcfile"] = config->name();
     helperargs["tempbackgroundrcfile"] = pBackgroundTempConfigFile->fileName();
 
-    KAuth::Action *pAction = authAction();
-    pAction->setArguments(helperargs);
-    KAuth::ActionReply reply = pAction->execute();
+    auto pAction = authAction();
+    if (!pAction.isValid()) {
+        qCritical() << "There was no authAction, not saving settings";
+        return;
+    }
+    pAction.setArguments(helperargs);
+    KAuth::ExecuteJob *j = pAction.execute();
 
-    switch (handleActionReply(this, reply)) {
-    case Helper::KdmrcInstallError:
-        KMessageBox::error(this,
-            i18n("Unable to install new kdmrc file from\n%1",
-                 config->name()));
-        break;
-    case Helper::BackgroundrcInstallError:
-        KMessageBox::error(this,
-            i18n("Unable to install new backgroundrc file from\n%1",
-                 pBackgroundTempConfigFile->fileName()));
-        break;
-    case Helper::KdmrcInstallError | Helper::BackgroundrcInstallError:
-        KMessageBox::error(this,
-            i18n("Unable to install new kdmrc file from\n%1"
-                 "\nand new backgroundrc file from\n%2",
-                 config->name(), pBackgroundTempConfigFile->fileName()));
-        break;
+    switch (handleKauthActionJob(this, j)) {
+        case Helper::KdmrcInstallError:
+            KMessageBox::error(this,
+                i18n("Unable to install new kdmrc file from\n%1",
+                     config->name()));
+            break;
+        case Helper::BackgroundrcInstallError:
+            KMessageBox::error(this,
+                i18n("Unable to install new backgroundrc file from\n%1",
+                     pBackgroundTempConfigFile->fileName()));
+            break;
+        case Helper::KdmrcInstallError | Helper::BackgroundrcInstallError:
+            KMessageBox::error(this,
+                i18n("Unable to install new kdmrc file from\n%1"
+                     "\nand new backgroundrc file from\n%2",
+                     config->name(), pBackgroundTempConfigFile->fileName()));
+            break;
     }
 
     emit changed(false);

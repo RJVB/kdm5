@@ -327,11 +327,11 @@ int
 main(int argc, char *argv[])
 {
     KCmdLineArgs::init(argc, argv, "krootimage", "kdmgreet",
-                       ki18n("KRootImage"), QByteArray(),
-                       ki18n("Fancy desktop background for kdm"));
+                       i18n("KRootImage"), QByteArray(),
+                       i18n("Fancy desktop background for kdm"));
 
     KCmdLineOptions options;
-    options.add("+config", ki18n("Name of the configuration file"));
+    options.add("+config", i18n("Name of the configuration file"));
     KCmdLineArgs::addCmdLineOptions(options);
 
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();

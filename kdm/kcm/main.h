@@ -39,7 +39,7 @@ class KDMUsersWidget;
 class KDMConvenienceWidget;
 class KBackground;
 class KConfig;
-class KTemporaryFile;
+class QTemporaryFile;
 
 class QStackedWidget;
 class QTabWidget;
@@ -89,8 +89,8 @@ class KDModule : public KCModule {
 
     void propagateUsers();
 
-    KTemporaryFile *pTempConfigFile;
-    KTemporaryFile *pBackgroundTempConfigFile;
+    QTemporaryFile *pTempConfigFile;
+    QTemporaryFile *pBackgroundTempConfigFile;
 
     KConfig *createTempConfig();
     KSharedConfigPtr createBackgroundTempConfig();
