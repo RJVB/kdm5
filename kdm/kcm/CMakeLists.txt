@@ -49,6 +49,7 @@ install(TARGETS kcm_kdm  DESTINATION ${PLUGIN_INSTALL_DIR})
 
 #### KAuth helper and actions ####
 add_executable(kcmkdmhelper helper.cpp)
+ecm_mark_nongui_executable(kcmkdmhelper)
 target_link_libraries(kcmkdmhelper
     KF5::AuthCore KF5::ConfigCore
     Qt5::Core)

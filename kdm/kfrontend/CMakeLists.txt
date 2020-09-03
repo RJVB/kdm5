@@ -74,6 +74,7 @@ endif (WITH_KDM_XCONSOLE)
 
 macro_add_file_dependencies(kdmconfig.h ${confci})
 add_executable(kdm_greet ${kdm_greet_SRCS})
+ecm_mark_nongui_executable(kdm_greet)
 target_link_libraries(kdm_greet ${KDE4_KDEUI_LIBS} ${QT_QTXML_LIBRARY} ${X11_X11_LIB} ${POSIX4_LIBRARIES})
 if (X11_XTest_FOUND)
   target_link_libraries(kdm_greet ${X11_XTest_LIB})
@@ -95,6 +96,7 @@ install(TARGETS kdm_config DESTINATION ${LIBEXEC_INSTALL_DIR})
 
 set(krootimage_SRCS krootimage.cpp krootimage.h ${backgroundlib_SRCS})
 add_executable(krootimage ${krootimage_SRCS})
+ecm_mark_nongui_executable(krootimage)
 target_link_libraries(krootimage ${KDE4_KDEUI_LIBS} ${X11_X11_LIB} ${QIMAGEBLITZ_LIBRARIES})
 install(TARGETS krootimage DESTINATION ${LIBEXEC_INSTALL_DIR})
 
@@ -109,6 +111,7 @@ install(TARGETS genkdmconf ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 set(kdmctl_SRCS kdmctl.c)
 add_executable(kdmctl ${kdmctl_SRCS})
+ecm_mark_nongui_executable(kdmctl)
 target_compile_options(kdmctl PRIVATE -U_REENTRANT)
 target_link_libraries(kdmctl ${SOCKET_LIBRARIES})
 add_dependencies(kdmctl ConfigCi)
