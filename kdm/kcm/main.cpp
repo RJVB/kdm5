@@ -55,6 +55,7 @@
 #include <QStackedWidget>
 #include <QTabWidget>
 #include <QVBoxLayout>
+#include <QGuiApplication>
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -63,7 +64,11 @@
 #include <grp.h>
 
 
-K_PLUGIN_FACTORY(KDMFactory, registerPlugin<KDModule>();)
+K_PLUGIN_FACTORY(KDMFactory, if (QGuiApplication::platformName() == QStringLiteral("xcb")) {
+        registerPlugin<KDModule>();
+    } else {
+        qCritical() << "KDM Control module not supported";
+    }; )
 
 int handleKauthActionJob(QWidget *parent, KAuth::ExecuteJob *j, QVariantMap *returnedData = 0)
 {
