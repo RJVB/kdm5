@@ -145,8 +145,13 @@ BGDialog::BGDialog(QWidget *parent, const KSharedConfigPtr &_config)
     connect(m_buttonAdvanced, SIGNAL(clicked()),
             SLOT(slotAdvanced()));
 
+#ifdef KDM_THEMEABLE
     connect(m_buttonGetNew, SIGNAL(clicked()),
             SLOT(slotGetNewStuff()));
+#else
+    m_buttonGetNew->setEnabled(false);
+    m_buttonGetNew->hide();
+#endif
 
     // renderers
     if (m_numScreens > 1) {
