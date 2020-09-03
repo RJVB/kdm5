@@ -520,7 +520,7 @@ void KBackgroundRenderer::wallpaperBlend()
     auto pEng = QApplication::desktop() ? QApplication::desktop()->paintEngine() : nullptr;
     if (!enabled() || wallpaperMode() == NoWallpaper
             || (blendMode() == NoBlending &&
-                ((pEng && pEng->hasFeature(QPaintEngine::Antialiasing))
+                ((!pEng || pEng->hasFeature(QPaintEngine::Antialiasing))
                  || !m_Wallpaper.hasAlphaChannel()))) {
         fastWallpaperBlend();
     } else {
