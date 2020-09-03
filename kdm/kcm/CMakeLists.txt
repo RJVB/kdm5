@@ -23,7 +23,8 @@ set(kcm_kdm_PART_SRCS ${kcmbackgroundlib_SRCS} ${backgroundlib_SRCS}
    kdm-conv.cpp
    main.cpp
    kbackedcombobox.cpp
-   positioner.cpp)
+   positioner.cpp
+   screenpreviewwidget.cpp)
 if (KDM_THEMEABLE)
    set(kcm_kdm_PART_SRCS ${kcm_kdm_PART_SRCS}
    kdm-theme.cpp)
@@ -34,7 +35,7 @@ add_library(kcm_kdm MODULE ${kcm_kdm_PART_SRCS})
 
 
 target_link_libraries(kcm_kdm ${KDE4_KIO_LIBS} ${QIMAGEBLITZ_LIBRARIES}
-    KF5::AuthCore KF5::CoreAddons KF5::ConfigCore KF5::ConfigWidgets KF5::I18n KF5::WidgetsAddons
+    KF5::AuthCore KF5::CoreAddons KF5::ConfigCore KF5::ConfigWidgets KF5::I18n KF5::WidgetsAddons KF5::Plasma
     Qt5::Core Qt5::Widgets Qt5::Svg Qt5::X11Extras
     ${X11_LIBRARIES})
 if (KDM_THEMEABLE)

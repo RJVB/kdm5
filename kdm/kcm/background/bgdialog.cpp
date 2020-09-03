@@ -64,9 +64,7 @@
 #include "bgadvanced.h"
 #include "bgdialog.h"
 
-#ifdef KDM_THEMEABLE
-#include "kworkspace/screenpreviewwidget.h"
-#endif
+#include "screenpreviewwidget.h"
 
 #define NR_PREDEF_PATTERNS 6
 
@@ -713,11 +711,9 @@ void BGDialog::updateUI()
         r->start(true);
     } else {
         for (unsigned j = 0; j < m_numScreens; ++j) {
-#ifdef KDM_THEMEABLE
             m_renderer[j+2]->stop();
             m_renderer[j+2]->setPreview(m_pMonitorArrangement->monitor(j)->previewRect().size());
             m_renderer[j+2]->start(true);
-#endif
         }
     }
 }
@@ -739,14 +735,12 @@ void BGDialog::slotPreviewDone(int screen_done)
     if (m_eScreen == 0) {
         m_pMonitorArrangement->setPixmap(pm);
     }
-#ifdef KDM_THEMEABLE
     else if (m_eScreen == 1) {
         for (unsigned i = 0; i < m_pMonitorArrangement->numMonitors(); ++i)
             m_pMonitorArrangement->monitor(i)->setPreview(pm);
     } else {
         m_pMonitorArrangement->monitor(screen_done)->setPreview(pm);
     }
-#endif
 }
 
 void BGDialog::slotImageDropped(const QString &uri)

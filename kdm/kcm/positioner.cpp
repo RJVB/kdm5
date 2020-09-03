@@ -19,8 +19,9 @@
 
 #include "positioner.h"
 
-#include <klocale.h>
-#include <kstandarddirs.h>
+#include <klocalizedstring.h>
+
+#include <QStandardPaths>
 
 #include <QFrame>
 #include <QLabel>
@@ -71,10 +72,8 @@ Positioner::Positioner(QWidget *parent)
     , m_y(50)
 {
     QDesktopWidget *desktop = QApplication::desktop();
-#ifdef KDM_THEMEABLE
     setRatio((qreal)desktop->width() / (qreal)desktop->height());
-#endif
-    m_anchor = QPixmap(KStandardDirs::locate("data", "kcontrol/pics/anchor.png"));
+    m_anchor = QPixmap(QStandardPaths::locate(QStandardPaths::GenericDataLocation, QStringLiteral("kcontrol/pics/anchor.png")));
     setFocusPolicy(Qt::StrongFocus);
     const int fw = MARGIN * 2;
     setMinimumSize(TOTAL_WIDTH + fw, TOTAL_HEIGHT + fw);
