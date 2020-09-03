@@ -27,17 +27,18 @@
 #include <QPixmap>
 #include <QSvgRenderer>
 #include <QTemporaryFile>
+#include <QApplication>
+#include <QDebug>
 
 #include <kconfig.h>
 #include <kconfiggroup.h>
 
 #include <kglobal.h>
-#include <kapplication.h>
 #include <kstandarddirs.h>
-#include <qimageblitz.h>
-#include <kcursor.h>
 #include <kfilemetainfo.h>
 #include <kmacroexpander.h>
+
+#include <qimageblitz.h>
 
 #include "bgdefaults.h"
 
@@ -516,9 +517,10 @@ bool KBackgroundRenderer::canTile() const
 
 void KBackgroundRenderer::wallpaperBlend()
 {
+    auto pEng = QApplication::desktop() ? QApplication::desktop()->paintEngine() : nullptr;
     if (!enabled() || wallpaperMode() == NoWallpaper
             || (blendMode() == NoBlending &&
-                (QApplication::desktop()->paintEngine()->hasFeature(QPaintEngine::Antialiasing)
+                ((pEng && pEng->hasFeature(QPaintEngine::Antialiasing))
                  || !m_Wallpaper.hasAlphaChannel()))) {
         fastWallpaperBlend();
     } else {
