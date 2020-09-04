@@ -105,8 +105,8 @@ KDMGeneralWidget::KDMGeneralWidget(QWidget *parent)
 //     colcombo->model()->sort(0);
 //     connect(colcombo, SIGNAL(activated(int)), SIGNAL(changed()));
 //     fl->addRow(i18n("Color sche&me:"), colcombo);
-//     wtstr = i18n(
-//         "You can choose a basic Color Scheme here that will be used by KDM only.");
+    wtstr = i18n(
+        "You can choose a basic Color Scheme here that will be used by KDM only.");
 //     colcombo->setWhatsThis(wtstr);
     auto manager = new KColorSchemeManager(box);
     colmenu = new QListView(box);
