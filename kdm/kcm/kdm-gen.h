@@ -25,6 +25,8 @@
 class KBackedComboBox;
 class KFontRequester;
 class KLanguageButton;
+class QPushButton;
+class QListView;
 class QCheckBox;
 
 class KDMGeneralWidget : public QWidget {
@@ -39,6 +41,7 @@ class KDMGeneralWidget : public QWidget {
 
     void loadColorSchemes(KBackedComboBox *combo);
     void loadGuiStyles(KBackedComboBox *combo);
+    void loadLanguages(KLanguageButton *btn);
 
   Q_SIGNALS:
     void changed();
@@ -54,7 +57,9 @@ class KDMGeneralWidget : public QWidget {
     QCheckBox *useThemeCheck;
 #endif
     KBackedComboBox *guicombo;
-    KBackedComboBox *colcombo;
+//     KBackedComboBox *colcombo;
+    QListView       *colmenu;
+    QString         selectedScheme;
     KLanguageButton *langcombo;
     QCheckBox *aacb;
     KFontRequester *greetingFontChooser;

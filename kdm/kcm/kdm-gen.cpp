@@ -25,6 +25,8 @@
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <kfontrequester.h>
+#include <kcolorschememanager.h>
+#include <kactionmenu.h>
 
 #include <kglobal.h>
 #include <kstandarddirs.h>
@@ -35,6 +37,13 @@
 #include <QPushButton>
 #include <QFormLayout>
 #include <QVBoxLayout>
+#include <QMenu>
+#include <QAction>
+#include <QStyleFactory>
+#include <QSet>
+#include <QLocale>
+#include <QListView>
+#include <QAbstractItemModel>
 
 extern KConfig *config;
 
@@ -52,7 +61,7 @@ KDMGeneralWidget::KDMGeneralWidget(QWidget *parent)
     // The Language group box
     langcombo = new KLanguageButton(box);
     langcombo->showLanguageCodes(true);
-    langcombo->loadAllLanguages();
+    loadLanguages(langcombo);
     connect(langcombo, SIGNAL(activated(QString)), SIGNAL(changed()));
     fl->addRow(i18n("&Language:"), langcombo);
     wtstr = i18n(
@@ -80,7 +89,7 @@ KDMGeneralWidget::KDMGeneralWidget(QWidget *parent)
 #endif
 
     guicombo = new KBackedComboBox(box);
-    guicombo->insertItem("", i18n("<placeholder>default</placeholder>"));
+    guicombo->insertItem("", i18n("<default>"));
     loadGuiStyles(guicombo);
     guicombo->model()->sort(0);
 
@@ -90,15 +99,27 @@ KDMGeneralWidget::KDMGeneralWidget(QWidget *parent)
         "You can choose a basic GUI style here that will be used by KDM only.");
     guicombo->setWhatsThis(wtstr);
 
-    colcombo = new KBackedComboBox(box);
-    colcombo->insertItem("", i18n("<placeholder>default</placeholder>"));
-    loadColorSchemes(colcombo);
-    colcombo->model()->sort(0);
-    connect(colcombo, SIGNAL(activated(int)), SIGNAL(changed()));
-    fl->addRow(i18n("Color sche&me:"), colcombo);
-    wtstr = i18n(
-        "You can choose a basic Color Scheme here that will be used by KDM only.");
-    colcombo->setWhatsThis(wtstr);
+//     colcombo = new KBackedComboBox(box);
+//     colcombo->insertItem("", i18n("<default>"));
+//     loadColorSchemes(colcombo);
+//     colcombo->model()->sort(0);
+//     connect(colcombo, SIGNAL(activated(int)), SIGNAL(changed()));
+//     fl->addRow(i18n("Color sche&me:"), colcombo);
+//     wtstr = i18n(
+//         "You can choose a basic Color Scheme here that will be used by KDM only.");
+//     colcombo->setWhatsThis(wtstr);
+    auto manager = new KColorSchemeManager(box);
+    colmenu = new QListView(box);
+    colmenu->setModel(manager->model());
+    colmenu->setSelectionMode(QAbstractItemView::SingleSelection);
+    connect(colmenu, &QListView::activated, this, &KDMGeneralWidget::changed);
+    selectedScheme.clear();
+    connect(colmenu, &QListView::activated, [&](const QModelIndex &index) {
+            selectedScheme = index.data(Qt::DisplayRole).toString();
+//             colcombo->setCurrentText(selectedScheme);
+        });
+    fl->addRow(i18n("Color sche&me:"), colmenu);
+    colmenu->setWhatsThis(wtstr);
 
     box = new QGroupBox(i18nc("@title:group", "Fonts"), this);
 //     mlml->addSpacing(KDialog::spacingHint());
@@ -154,6 +175,7 @@ void KDMGeneralWidget::loadColorSchemes(KBackedComboBox *combo)
 
 void KDMGeneralWidget::loadGuiStyles(KBackedComboBox *combo)
 {
+#if 0
     // XXX: Global + local schemes
     const QStringList list = KGlobal::dirs()->
         findAllResources("data", "kstyle/themes/*.themerc", KStandardDirs::NoDuplicates);
@@ -172,6 +194,46 @@ void KDMGeneralWidget::loadGuiStyles(KBackedComboBox *combo)
 
         combo->insertItem(str2, config.group("Misc").readEntry("Name"));
     }
+#else
+    QStringList availableStyles = QStyleFactory::keys();
+    for (const auto &style : availableStyles) {
+        combo->insertItem(style, style);
+    }
+#endif
+}
+
+static bool stripCountryCode(QString *languageCode)
+{
+    const int idx = languageCode->indexOf(QLatin1String("_"));
+    if (idx != -1) {
+        *languageCode = languageCode->left(idx);
+        return true;
+    }
+    return false;
+}
+
+void KDMGeneralWidget::loadLanguages(KLanguageButton *button)
+{
+    const QLocale cLocale(QLocale::C);
+    QSet<QString> insertedLanguges;
+
+    const QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage, QLocale::AnyScript, QLocale::AnyCountry);
+    for(const auto &l : allLocales) {
+        if (l != cLocale) {
+            QString languageCode = l.name();
+            if (!insertedLanguges.contains(languageCode)
+                && KLocalizedString::isApplicationTranslatedInto(languageCode)) {
+                button->insertLanguage(languageCode);
+                insertedLanguges << languageCode;
+            } else if (stripCountryCode(&languageCode)) {
+                if (!insertedLanguges.contains(languageCode)
+                    && KLocalizedString::isApplicationTranslatedInto(languageCode)) {
+                    button->insertLanguage(languageCode);
+                    insertedLanguges << languageCode;
+                }
+            }
+        }
+    }
 }
 
 void KDMGeneralWidget::set_def()
@@ -189,7 +251,7 @@ void KDMGeneralWidget::save()
     configGrp.writeEntry("UseTheme", useThemeCheck->isChecked());
 #endif
     configGrp.writeEntry("GUIStyle", guicombo->currentId());
-    configGrp.writeEntry("ColorScheme", colcombo->currentId());
+    configGrp.writeEntry("ColorScheme", selectedScheme);
     configGrp.writeEntry("Language", langcombo->current());
     configGrp.writeEntry("StdFont", stdFontChooser->font());
     configGrp.writeEntry("GreetFont", greetingFontChooser->font());
@@ -212,7 +274,27 @@ void KDMGeneralWidget::load()
     guicombo->setCurrentId(configGrp.readEntry("GUIStyle"));
 
     // Check the Color Scheme
-    colcombo->setCurrentId(configGrp.readEntry("ColorScheme"));
+//     colcombo->setCurrentId(configGrp.readEntry("ColorScheme"));
+//     selectedScheme = colcombo->currentText();
+    selectedScheme = configGrp.readEntry("ColorScheme");
+    auto model = colmenu->model();
+    bool found = false;
+    for (int row = 0 ; !found && row < model->rowCount() ; ++row) {
+        const auto index = model->index(row, 0);
+        if (index.isValid()) {
+            if (index.data(Qt::DisplayRole).toString() == selectedScheme) {
+                found = true;
+            } else if (index.data(Qt::UserRole).toString().contains(selectedScheme)) {
+                // (old) configuration file specifies the scheme's filename.
+                selectedScheme = index.data(Qt::DisplayRole).toString();
+                found = true;
+            }
+            if (found) {
+                colmenu->scrollTo(index);
+                colmenu->setCurrentIndex(index);
+            }
+        }
+    }
 
     // get the language
     langcombo->setCurrentItem(configGrp.readEntry("Language", "C"));
@@ -235,7 +317,19 @@ void KDMGeneralWidget::defaults()
     useThemeCheck->setChecked(true);
 #endif
     guicombo->setCurrentId("");
-    colcombo->setCurrentId("");
+//     colcombo->setCurrentId("");
+    selectedScheme = QStringLiteral("breeze");
+    auto model = colmenu->model();
+    bool found = false;
+    for (int row = 0 ; !found && row < model->rowCount() ; ++row) {
+        const auto index = model->index(row, 0);
+        if (index.isValid()) {
+            if (index.data(Qt::DisplayRole).toString() == selectedScheme) {
+                colmenu->scrollTo(index);
+                found = true;
+            }
+        }
+    }
     langcombo->setCurrentItem("en_US");
     set_def();
     aacb->setChecked(false);

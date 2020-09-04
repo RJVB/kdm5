@@ -22,10 +22,13 @@
 
 #include <KComboBox>
 
+class QUrl;
+
 class KBackedComboBox : public KComboBox {
 
   public:
     KBackedComboBox(QWidget *parent) : KComboBox(false, parent) {}
+    void insertItem(const QString &id, const QUrl &url);
     void insertItem(const QString &id, const QString &name);
     void setCurrentId(const QString &id);
     const QString currentId() const;

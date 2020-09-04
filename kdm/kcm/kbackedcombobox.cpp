@@ -19,6 +19,16 @@
 
 #include "kbackedcombobox.h"
 
+#include <QUrl>
+
+void KBackedComboBox::insertItem(const QString &id, const QUrl &url)
+{
+    const QString name = url.toString();
+    id2name[id] = name;
+    name2id[name] = id;
+    KComboBox::addUrl(url);
+}
+
 void KBackedComboBox::insertItem(const QString &id, const QString &name)
 {
     id2name[id] = name;

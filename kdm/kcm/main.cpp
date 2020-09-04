@@ -63,9 +63,13 @@
 #include <pwd.h>
 #include <grp.h>
 
+static QByteArray origPluginPath;
 
 K_PLUGIN_FACTORY(KDMFactory, if (QGuiApplication::platformName() == QStringLiteral("xcb")) {
         registerPlugin<KDModule>();
+        origPluginPath = qgetenv("QT_PLUGIN_PATH");
+        // KDM will (likely) run without QT_PLUGIN_PATH set, so make certain we do, too.
+        qunsetenv("QT_PLUGIN_PATH");
     } else {
         qCritical() << "KDM Control module not supported";
     }; )
@@ -335,6 +339,9 @@ KDModule::~KDModule()
     delete config;
     delete pBackgroundTempConfigFile;
     delete pTempConfigFile;
+    if (!origPluginPath.isEmpty()) {
+        qputenv("QT_PLUGIN_PATH", origPluginPath);
+    }
 }
 
 void KDModule::load()
