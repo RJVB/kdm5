@@ -44,8 +44,38 @@
 #include <QLocale>
 #include <QListView>
 #include <QAbstractItemModel>
+#include <QFont>
+#include <QFontDatabase>
 
 extern KConfig *config;
+
+QFont stripStyleName(KFontRequester *req, QFontDatabase &db)
+{
+    auto f = req->font();
+    const auto &styleName = f.styleName();
+    if (styleName.isEmpty()) {
+        return f;
+    } else {
+        QFont g = (db.styleString(f) != styleName) ?
+            db.font(f.family(), styleName, f.pointSize())
+            : QFont(f.family(), f.pointSize(), f.weight());
+        if (auto s = f.pixelSize() > 0) {
+            g.setPixelSize(s);
+        }
+        g.setStyleHint(f.styleHint(), f.styleStrategy());
+        g.setStyle(f.style());
+        if (f.underline()) {
+            g.setUnderline(true);
+        }
+        if (f.strikeOut()) {
+            g.setStrikeOut(true);
+        }
+        if (f.fixedPitch()) {
+            g.setFixedPitch(true);
+        }
+        return g;
+    }
+}
 
 KDMGeneralWidget::KDMGeneralWidget(QWidget *parent)
     : QWidget(parent)
@@ -245,6 +275,7 @@ void KDMGeneralWidget::set_def()
 
 void KDMGeneralWidget::save()
 {
+    QFontDatabase fdb;
     KConfigGroup configGrp = config->group("X-*-Greeter");
 
 #ifdef KDM_THEMEABLE
@@ -253,9 +284,9 @@ void KDMGeneralWidget::save()
     configGrp.writeEntry("GUIStyle", guicombo->currentId());
     configGrp.writeEntry("ColorScheme", selectedScheme);
     configGrp.writeEntry("Language", langcombo->current());
-    configGrp.writeEntry("StdFont", stdFontChooser->font());
-    configGrp.writeEntry("GreetFont", greetingFontChooser->font());
-    configGrp.writeEntry("FailFont", failFontChooser->font());
+    configGrp.writeEntry("StdFont", stripStyleName(stdFontChooser, fdb));
+    configGrp.writeEntry("GreetFont", stripStyleName(greetingFontChooser, fdb));
+    configGrp.writeEntry("FailFont", stripStyleName(failFontChooser, fdb));
     configGrp.writeEntry("AntiAliasing", aacb->isChecked());
 }
 
