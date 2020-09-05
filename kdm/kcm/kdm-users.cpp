@@ -21,24 +21,28 @@
 
 #include "helper.h"
 
-#include <KComboBox>
-#include <KIconDialog>
-#include <KLineEdit>
-#include <KLocale>
-#include <KMessageBox>
-#include <KTemporaryFile>
-#include <KConfig>
-#include <KConfigGroup>
-#include <KStandardDirs>
-#include <KStandardGuiItem>
+// KF5 headers
+#include <kcombobox.h>
+#include <kicondialog.h>
+#include <klineedit.h>
+#include <klocalizedstring.h>
+#include <kmessagebox.h>
+#include <kconfig.h>
+#include <kconfiggroup.h>
+#include <kstandardguiitem.h>
+
+// KDELibs4Support:
 #include <KIO/NetAccess>
 
+#include <QTemporaryFile>
+#include <QMimeData>
+#include <QDir>
+#include <QFile>
+#include <QStandardPaths>
 #include <QButtonGroup>
 #include <QCheckBox>
-#include <QDir>
 #include <QDragEnterEvent>
 #include <QEvent>
-#include <QFile>
 #include <QGroupBox>
 #include <QIntValidator>
 #include <QLabel>
@@ -103,14 +107,14 @@ KDMUsersWidget::KDMUsersWidget(QWidget *parent)
 #endif
 
     m_userPixDir = config->group("X-*-Greeter").readEntry("FaceDir",
-            QString(KStandardDirs::installPath("data") + "kdm/faces" + '/'));
+            QString(QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation).last() + "kdm/faces" + '/'));
 
     if (!getpwnam("nobody"))
         KMessageBox::sorry(this, i18n(
             "User 'nobody' does not exist. "
             "Displaying user images will not work in KDM."));
 
-    m_defaultText = i18n("<placeholder>default</placeholder>");
+    m_defaultText = i18n("<default>");
 
     minGroup = new QGroupBox(i18nc(
         "@title:group UIDs belonging to system users like 'cron'", "System U&IDs"), this);
@@ -362,7 +366,7 @@ void KDMUsersWidget::changeUserPix(const QString &pix)
 
     p = p.scaled(48, 48, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-    KTemporaryFile sourceFile;
+    QTemporaryFile sourceFile;
     sourceFile.open();
     QString source = sourceFile.fileName();
     p.save(source, "PNG");
@@ -384,7 +388,7 @@ void KDMUsersWidget::changeUserPix(const QString &pix)
 void KDMUsersWidget::slotUserButtonClicked()
 {
     KIconDialog dlg;
-    dlg.setCustomLocation(KStandardDirs::installPath("data") + "kdm/pics/users");
+    dlg.setCustomLocation(QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation).last() + "kdm/pics/users");
     dlg.setup(KIconLoader::NoGroup, KIconLoader::Any, false, 48, true, true, false);
     QString ic = dlg.openDialog();
     if (ic.isEmpty())
