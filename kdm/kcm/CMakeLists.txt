@@ -14,7 +14,14 @@ ki18n_wrap_ui(kcmbackgroundlib_SRCS
     background/bgdialog_ui.ui
     background/bgadvanced_ui.ui)
 
-set(kcm_kdm_PART_SRCS ${kcmbackgroundlib_SRCS} ${backgroundlib_SRCS}
+set(kcm_custom_kfontreq_SRCS
+    kwidgetsaddons/fonthelpers.cpp
+    kwidgetsaddons/kfontchooserdialog.cpp
+    kwidgetsaddons/kfontrequester.cpp)
+include_directories(kwidgetsaddons)
+
+set(kcm_kdm_PART_SRCS
+   ${kcmbackgroundlib_SRCS} ${backgroundlib_SRCS} ${kcm_custom_kfontreq_SRCS}
    background.cpp
    kdm-gen.cpp
    kdm-dlg.cpp

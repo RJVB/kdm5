@@ -24,7 +24,7 @@
 #include <klocalizedstring.h>
 #include <kconfig.h>
 #include <kconfiggroup.h>
-#include <kfontrequester.h>
+#include "kwidgetsaddons/kfontrequester.h"
 #include <kcolorschememanager.h>
 #include <kactionmenu.h>
 
@@ -48,34 +48,6 @@
 #include <QFontDatabase>
 
 extern KConfig *config;
-
-QFont stripStyleName(KFontRequester *req, QFontDatabase &db)
-{
-    auto f = req->font();
-    const auto &styleName = f.styleName();
-    if (styleName.isEmpty()) {
-        return f;
-    } else {
-        QFont g = (db.styleString(f) != styleName) ?
-            db.font(f.family(), styleName, f.pointSize())
-            : QFont(f.family(), f.pointSize(), f.weight());
-        if (auto s = f.pixelSize() > 0) {
-            g.setPixelSize(s);
-        }
-        g.setStyleHint(f.styleHint(), f.styleStrategy());
-        g.setStyle(f.style());
-        if (f.underline()) {
-            g.setUnderline(true);
-        }
-        if (f.strikeOut()) {
-            g.setStrikeOut(true);
-        }
-        if (f.fixedPitch()) {
-            g.setFixedPitch(true);
-        }
-        return g;
-    }
-}
 
 KDMGeneralWidget::KDMGeneralWidget(QWidget *parent)
     : QWidget(parent)
@@ -157,19 +129,25 @@ KDMGeneralWidget::KDMGeneralWidget(QWidget *parent)
     fl = new QFormLayout(box);
 
     stdFontChooser = new KFontRequester(box);
+    stdFontChooser->setAlwaysTriggerSignal(false);
     stdFontChooser->setWhatsThis(i18n(
         "This changes the font which is used for all the text in the login manager "
         "except for the greeting and failure messages."));
     connect(stdFontChooser, SIGNAL(fontSelected(QFont)), SIGNAL(changed()));
+    connect(stdFontChooser, &KFontRequester::fontSelected, [&](const QFont &f) {
+            qWarning() << sender() << "selected" << f;
+        });
     fl->addRow(i18nc("... font", "&General:"), stdFontChooser);
 
     failFontChooser = new KFontRequester(box);
+    failFontChooser->setAlwaysTriggerSignal(false);
     failFontChooser->setWhatsThis(i18n(
         "This changes the font which is used for failure messages in the login manager."));
     connect(failFontChooser, SIGNAL(fontSelected(QFont)), SIGNAL(changed()));
     fl->addRow(i18nc("font for ...", "&Failure:"), failFontChooser);
 
     greetingFontChooser = new KFontRequester(box);
+    greetingFontChooser->setAlwaysTriggerSignal(false);
     greetingFontChooser->setWhatsThis(i18n(
         "This changes the font which is used for the login manager's greeting."));
     connect(greetingFontChooser, SIGNAL(fontSelected(QFont)), SIGNAL(changed()));
@@ -284,9 +262,9 @@ void KDMGeneralWidget::save()
     configGrp.writeEntry("GUIStyle", guicombo->currentId());
     configGrp.writeEntry("ColorScheme", selectedScheme);
     configGrp.writeEntry("Language", langcombo->current());
-    configGrp.writeEntry("StdFont", stripStyleName(stdFontChooser, fdb));
-    configGrp.writeEntry("GreetFont", stripStyleName(greetingFontChooser, fdb));
-    configGrp.writeEntry("FailFont", stripStyleName(failFontChooser, fdb));
+    configGrp.writeEntry("StdFont", stdFontChooser->font());
+    configGrp.writeEntry("GreetFont", greetingFontChooser->font());
+    configGrp.writeEntry("FailFont", failFontChooser->font());
     configGrp.writeEntry("AntiAliasing", aacb->isChecked());
 }
 
