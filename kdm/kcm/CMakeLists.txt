@@ -33,10 +33,30 @@ endif()
 
 add_library(kcm_kdm MODULE ${kcm_kdm_PART_SRCS})
 
-
-target_link_libraries(kcm_kdm ${KDE4_KIO_LIBS} ${QIMAGEBLITZ_LIBRARIES}
-    KF5::AuthCore KF5::CoreAddons KF5::ConfigCore KF5::ConfigWidgets KF5::I18n KF5::WidgetsAddons KF5::Plasma
-    Qt5::Core Qt5::Widgets Qt5::Svg Qt5::X11Extras
+# KDE4_KIO_LIBS=KF5::KDELibs4Support
+#     Qt5::Network
+#     Qt5::DBus
+#     Qt5::Xml
+#     KF5::KIOCore
+#     KF5::I18n
+#     KF5::CoreAddons
+#     KF5::Codecs
+#     KF5::ConfigCore
+#     KF5::WidgetsAddons
+#     KF5::ItemModels
+#     KF5::ConfigWidgets
+#     KF5::Completion
+#     KF5::XmlGui
+#     KF5::IconThemes
+#     KF5::KIOWidgets
+#     KF5::ItemViews
+#     KF5::Emoticons
+target_link_libraries(kcm_kdm ${QIMAGEBLITZ_LIBRARIES}
+    KF5::AuthCore KF5::CoreAddons KF5::Completion KF5::ConfigCore KF5::ConfigWidgets
+    KF5::I18n KF5::IconThemes KF5::WidgetsAddons KF5::Plasma
+    KF5::KIOCore KF5::KIOWidgets
+    KF5::KDELibs4Support
+    Qt5::Core Qt5::Widgets Qt5::Network Qt5::Svg Qt5::X11Extras
     ${X11_LIBRARIES})
 if (KDM_THEMEABLE)
     target_link_libraries(kcm_kdm ${KDE4_KNEWSTUFF3_LIBS} kworkspace)

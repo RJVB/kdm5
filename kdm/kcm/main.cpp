@@ -42,6 +42,7 @@
 #include <kconfig.h>
 #include <kpluginfactory.h>
 #include <kpluginloader.h>
+#include <kurlmimedata.h>
 
 #include <QDebug>
 #include <QTemporaryFile>
@@ -95,7 +96,7 @@ int handleKauthActionJob(QWidget *parent, KAuth::ExecuteJob *j, QVariantMap *ret
 
 QUrl *decodeImgDrop(QDropEvent *e, QWidget *wdg)
 {
-    auto uriList = e->mimeData()->urls();
+    auto uriList = KUrlMimeData::urlsFromMimeData(e->mimeData());
     if (!uriList.isEmpty()) {
         QUrl *url = new QUrl(uriList.first());
 

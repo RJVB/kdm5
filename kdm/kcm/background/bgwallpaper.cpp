@@ -28,6 +28,7 @@
 #include <QImageReader>
 
 #include <klocalizedstring.h>
+#include <kurlmimedata.h>
 
 #include <kglobal.h>
 #include <kstandarddirs.h>
@@ -64,8 +65,7 @@ void BGMultiWallpaperList::dragEnterEvent(QDragEnterEvent *ev)
 void BGMultiWallpaperList::dropEvent(QDropEvent *ev)
 {
     QStringList files;
-    const auto kk = ev->mimeData();
-    const auto urls = ev->mimeData()->urls();
+    const auto urls = KUrlMimeData::urlsFromMimeData(ev->mimeData());
     for (auto it = urls.constBegin();
             it != urls.constEnd(); ++it) {
         // TODO: Download remote files

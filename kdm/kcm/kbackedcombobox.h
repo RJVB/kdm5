@@ -20,7 +20,7 @@
 #ifndef KBACKEDCOMBOBOX_H
 #define KBACKEDCOMBOBOX_H
 
-#include <KComboBox>
+#include <kcombobox.h>
 
 class QUrl;
 
