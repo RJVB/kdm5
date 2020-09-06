@@ -3265,14 +3265,19 @@ int main(int argc, char **argv)
             for (ce = cs->ents; ce; ce = ce->next)
                 if (ce->spec->func && i == ce->spec->prio)
                     ce->spec->func(ce, cs);
-    f = createFile("kdmrc", kdmrcmode);
+    char *rcname;
+    if (use_destdir) {
+        f = createFile(rcname = "kdmrc", kdmrcmode);
+    } else {
+        f = createFile(rcname = "kdmrc.sample", kdmrcmode);
+    }
     writeKdmrc(f);
     fclose_(f);
 
     f = createFile("README", 0644);
     fprintf_(f,
 "This automatically generated configuration consists of the following files:\n");
-    fprintf_(f, "- " KDMCONF "/kdmrc\n");
+    fprintf_(f, "- " KDMCONF "/%s\n", rcname);
     for (fp = aflist; fp; fp = fp->next)
         fprintf_(f, "- %s\n", fp->str);
     if (use_destdir && !no_in_notice)
