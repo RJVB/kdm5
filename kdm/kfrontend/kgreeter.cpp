@@ -1107,4 +1107,4 @@ KThemedGreeter::keyPressEvent(QKeyEvent *e)
 }
 #endif
 
-#include "kgreeter.moc"
+#include "moc_kgreeter.cpp"

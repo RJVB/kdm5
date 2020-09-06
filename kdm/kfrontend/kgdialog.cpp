@@ -236,4 +236,4 @@ KGDialog::slotPopulateDisplays()
 #endif
 }
 
-#include "kgdialog.moc"
+#include "moc_kgdialog.cpp"

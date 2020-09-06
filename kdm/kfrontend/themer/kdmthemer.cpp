@@ -272,4 +272,4 @@ KdmThemer::setTypeVisible(const QString &t, bool show)
     rootItem->updateVisible();
 }
 
-#include "kdmthemer.moc"
+#include "moc_kdmthemer.cpp"

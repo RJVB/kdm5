@@ -362,4 +362,4 @@ KdmLabel::updateWidgetAttribs()
     myWidget->setPalette(p);
 }
 
-#include "kdmlabel.moc"
+#include "moc_kdmlabel.cpp"

@@ -27,6 +27,7 @@ Boston, MA 02110-1301, USA.
 
 #include <QApplication>
 #include <QTimer>
+#include <QCommandLineParser>
 
 /**
  * In xinerama mode, each screen is rendered separately by KBackgroundRenderer.
@@ -37,7 +38,7 @@ Boston, MA 02110-1301, USA.
 class KVirtualBGRenderer : public QObject {
     Q_OBJECT
   public:
-    explicit KVirtualBGRenderer(const KSharedConfigPtr &config);
+    explicit KVirtualBGRenderer(const KSharedConfigPtr &config, QObject *parent = nullptr);
     ~KVirtualBGRenderer();
 
     KBackgroundRenderer * renderer(unsigned screen);
@@ -87,14 +88,15 @@ class MyApplication : public QApplication {
     Q_OBJECT
 
   public:
-    MyApplication(const char *conf, int &argc, char **argv);
+    MyApplication(int &argc, char **argv);
+    void init(const QString &confFile);
 
   private Q_SLOTS:
     void renderDone();
     void slotTimeout();
 
   private:
-    KVirtualBGRenderer renderer;
+    KVirtualBGRenderer *renderer = nullptr;
     QTimer timer;
 };
 

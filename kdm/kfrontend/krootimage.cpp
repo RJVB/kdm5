@@ -21,26 +21,28 @@ Boston, MA 02110-1301, USA.
 */
 
 #include "krootimage.h"
+#include "config-kdm.h"
 
 #include <bgdefaults.h>
 
-#include <kcmdlineargs.h>
 #include <kconfiggroup.h>
-#include <kdebug.h>
-#include <kcomponentdata.h>
-#include <klocale.h>
+#include <klocalizedstring.h>
+#include <kaboutdata.h>
 
+#include <QCommandLineOption>
 #include <QDesktopWidget>
 #include <QFile>
 #include <QHash>
 #include <QPainter>
+#include <QDebug>
 #include <QX11Info>
 
 #include <X11/Xlib.h>
 
 #include <stdlib.h>
 
-KVirtualBGRenderer::KVirtualBGRenderer(const KSharedConfigPtr &config)
+KVirtualBGRenderer::KVirtualBGRenderer(const KSharedConfigPtr &config, QObject *parent)
+    : QObject(parent)
 {
     m_pPixmap = 0;
     m_numRenderers = 0;
@@ -270,17 +272,19 @@ void KVirtualBGRenderer::enableTiling(bool enable)
         m_renderer[i]->enableTiling(enable);
 }
 
-
-MyApplication::MyApplication(const char *conf, int &argc, char **argv)
+MyApplication::MyApplication(int &argc, char **argv)
     : QApplication(argc, argv)
-    , renderer(KSharedConfig::openConfig(QFile::decodeName(conf)))
+{}
+
+void MyApplication::init(const QString &confFile)
 {
+    renderer = new KVirtualBGRenderer(KSharedConfig::openConfig(QFile::decodeName(confFile.toUtf8())), this);
     connect(&timer, SIGNAL(timeout()), SLOT(slotTimeout()));
-    connect(&renderer, SIGNAL(imageDone()), this, SLOT(renderDone()));
-    renderer.enableTiling(true); // optimize
-    renderer.changeWallpaper(); // cannot do it when we're killed, so do it now
+    connect(renderer, SIGNAL(imageDone()), this, SLOT(renderDone()));
+    renderer->enableTiling(true); // optimize
+    renderer->changeWallpaper(); // cannot do it when we're killed, so do it now
     timer.start(60000);
-    renderer.start();
+    renderer->start();
 }
 
 
@@ -288,14 +292,16 @@ void
 MyApplication::renderDone()
 {
     QPalette palette;
-    palette.setBrush(desktop()->backgroundRole(), QBrush(renderer.pixmap()));
+    palette.setBrush(desktop()->backgroundRole(), QBrush(renderer->pixmap()));
     desktop()->setPalette(palette);
-    XClearWindow(QX11Info::display(), desktop()->winId());
+    if (QX11Info::display()) {
+        XClearWindow(QX11Info::display(), desktop()->winId());
+    }
 
-    renderer.saveCacheFile();
-    renderer.cleanup();
-    for (unsigned i = 0; i < renderer.numRenderers(); ++i) {
-        KBackgroundRenderer *r = renderer.renderer(i);
+    renderer->saveCacheFile();
+    renderer->cleanup();
+    for (unsigned i = 0; i < renderer->numRenderers(); ++i) {
+        KBackgroundRenderer *r = renderer->renderer(i);
         if (r->backgroundMode() == KBackgroundSettings::Program ||
             (r->multiWallpaperMode() != KBackgroundSettings::NoMulti &&
              r->multiWallpaperMode() != KBackgroundSettings::NoMultiRandom))
@@ -309,46 +315,51 @@ MyApplication::slotTimeout()
 {
     bool change = false;
 
-    if (renderer.needProgramUpdate()) {
-        renderer.programUpdate();
+    if (renderer->needProgramUpdate()) {
+        renderer->programUpdate();
         change = true;
     }
 
-    if (renderer.needWallpaperChange()) {
-        renderer.changeWallpaper();
+    if (renderer->needWallpaperChange()) {
+        renderer->changeWallpaper();
         change = true;
     }
 
     if (change)
-        renderer.start();
+        renderer->start();
 }
 
 int
 main(int argc, char *argv[])
 {
-    KCmdLineArgs::init(argc, argv, "krootimage", "kdmgreet",
-                       i18n("KRootImage"), QByteArray(),
-                       i18n("Fancy desktop background for kdm"));
+    QCommandLineParser parser;
+    
+    KLocalizedString::setApplicationDomain("kdmgreet");
 
-    KCmdLineOptions options;
-    options.add("+config", i18n("Name of the configuration file"));
-    KCmdLineArgs::addCmdLineOptions(options);
+    KAboutData about("krootimage", i18n("KRootImage"), QStringLiteral(KDM5_VERSION),
+                       i18n("Fancy desktop background for kdm"), KAboutLicense::GPL,
+                       i18n("(c) 1996-2010 The KDM Authors"), QString(),
+                       QStringLiteral("http://developer.kde.org/~ossi/sw/kdm.html"));
+    about.setupCommandLine(&parser);
 
-    KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
-    if (!args->count())
-        args->usage();
-    KComponentData inst(KCmdLineArgs::aboutData());
-    MyApplication app(args->arg(0).toLocal8Bit(),
-                      KCmdLineArgs::qtArgc(), KCmdLineArgs::qtArgv());
-    args->clear();
+    parser.addPositionalArgument(QStringLiteral("config"), i18n("Name of the configuration file"));
 
-    app.exec();
-    app.flush();
+    MyApplication app(argc, argv);
 
-    // Keep color resources after termination
-    XSetCloseDownMode(QX11Info::display(), RetainTemporary);
+    parser.process(app);
+    const auto args = parser.positionalArguments();
+    if (args.count() > 0) {
+        app.init(args.first());
+    }
+    const auto ret = app.exec();
 
-    return 0;
+    if (QX11Info::display()) {
+        app.flush();
+        // Keep color resources after termination
+        XSetCloseDownMode(QX11Info::display(), RetainTemporary);
+    }
+
+    return ret;
 }
 
-#include "krootimage.moc"
+#include "moc_krootimage.cpp"

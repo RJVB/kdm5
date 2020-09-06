@@ -732,4 +732,4 @@ KDMCancelShutdown::KDMCancelShutdown(int how, int start, int timeout,
     complete(0);
 }
 
-#include "kdmshutdown.moc"
+#include "moc_kdmshutdown.cpp"

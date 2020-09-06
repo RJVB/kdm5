@@ -97,7 +97,11 @@ install(TARGETS kdm_config DESTINATION ${LIBEXEC_INSTALL_DIR})
 set(krootimage_SRCS krootimage.cpp krootimage.h ${backgroundlib_SRCS})
 add_executable(krootimage ${krootimage_SRCS})
 ecm_mark_nongui_executable(krootimage)
-target_link_libraries(krootimage ${KDE4_KDEUI_LIBS} ${X11_X11_LIB} ${QIMAGEBLITZ_LIBRARIES})
+target_link_libraries(krootimage
+    KF5::CoreAddons KF5::ConfigCore
+    KF5::I18n KF5::KDELibs4Support
+    Qt5::Core Qt5::Widgets Qt5::Network Qt5::Svg Qt5::X11Extras
+    ${X11_LIBRARIES} ${QIMAGEBLITZ_LIBRARIES})
 install(TARGETS krootimage DESTINATION ${LIBEXEC_INSTALL_DIR})
 
 set(genkdmconf_SRCS genkdmconf.c)

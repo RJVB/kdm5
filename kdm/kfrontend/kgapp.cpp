@@ -536,4 +536,4 @@ main(int argc ATTR_UNUSED, char **argv)
     return EX_NORMAL;
 }
 
-#include "kgapp.moc"
+#include "moc_kgapp.cpp"

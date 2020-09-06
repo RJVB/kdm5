@@ -82,4 +82,4 @@ KdmRect::statusChanged(bool descend)
     needUpdate();
 }
 
-#include "kdmrect.moc"
+#include "moc_kdmrect.cpp"

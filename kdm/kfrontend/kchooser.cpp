@@ -249,4 +249,4 @@ void ChooserDlg::slotReadPipe()
     }
 }
 
-#include "kchooser.moc"
+#include "moc_kchooser.cpp"

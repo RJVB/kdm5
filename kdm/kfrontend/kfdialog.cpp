@@ -190,4 +190,4 @@ KFMsgBox::box(QWidget *parent, QMessageBox::Icon type, const QString &text)
     dlg.exec();
 }
 
-#include "kfdialog.moc"
+#include "moc_kfdialog.cpp"

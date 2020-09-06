@@ -367,4 +367,4 @@ KdmPixmap::statusChanged(bool descend)
     needUpdate();
 }
 
-#include "kdmpixmap.moc"
+#include "moc_kdmpixmap.cpp"

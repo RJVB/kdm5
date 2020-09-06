@@ -66,4 +66,4 @@ KdmList::setWidget(QWidget *widget)
         setWidgetAttribs(lw->viewport());
 }
 
-#include "kdmlist.moc"
+#include "moc_kdmlist.cpp"

@@ -661,4 +661,4 @@ KdmItem::setFixedLayout(const QDomNode &node)
     currentManager = MFixed;
 }
 
-#include "kdmitem.moc"
+#include "moc_kdmitem.cpp"

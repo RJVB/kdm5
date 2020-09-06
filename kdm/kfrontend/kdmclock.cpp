@@ -146,4 +146,4 @@ void KdmClock::paintEvent(QPaintEvent *)
     } // if (mDigital)
 }
 
-#include "kdmclock.moc"
+#include "moc_kdmclock.cpp"

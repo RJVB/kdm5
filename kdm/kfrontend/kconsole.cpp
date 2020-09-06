@@ -172,4 +172,4 @@ KConsole::slotData()
     }
 }
 
-#include "kconsole.moc"
+#include "moc_kconsole.cpp"

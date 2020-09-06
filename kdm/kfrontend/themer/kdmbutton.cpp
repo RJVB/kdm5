@@ -98,4 +98,4 @@ KdmButton::drawContents(QPainter *, const QRect &)
 {
 }
 
-#include "kdmbutton.moc"
+#include "moc_kdmbutton.cpp"
