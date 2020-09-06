@@ -840,10 +840,12 @@ void KBackgroundRenderer::stop()
 void KBackgroundRenderer::cleanup()
 {
     setBusyCursor(false);
-    m_Background = QImage();
-    m_Image = QImage();
-    m_Pixmap = QPixmap();
-    m_Wallpaper = QImage();
+    if (!QCoreApplication::closingDown()) {
+        m_Background = QImage();
+        m_Image = QImage();
+        m_Pixmap = QPixmap();
+        m_Wallpaper = QImage();
+    }
     delete m_pProc;
     m_pProc = 0L;
     m_State = 0;
