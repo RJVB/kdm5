@@ -39,13 +39,20 @@
 
 #include <kconfig.h>
 #include <klocalizedstring.h>
-// #include <kpushbutton.h>
 #include <kseparator.h>
 #include <kstandardguiitem.h>
 #include <khelpclient.h>
 #include <kurllabel.h>
 #include <kwindowconfig.h>
 
+// in this project we have X11
+#if !defined(HAVE_X11)
+#   if defined(KWINDOWSYSTEM_HAVE_X11)
+#       define HAVE_X11 KWINDOWSYSTEM_HAVE_X11
+#   else
+#       define HAVE_X11 0
+#   endif
+#endif
 #if HAVE_X11
 #include <qx11info_x11.h>
 #include <netwm.h>
@@ -522,7 +529,7 @@ void KDialog::setPlainCaption(const QString &caption)
         win->setWindowTitle(caption);
 #if HAVE_X11
         if (QGuiApplication::platformName() == QStringLiteral("xcb")) {
-            NETWinInfo info(QX11Info::connection(), win->winId(), QX11Info::appRootWindow(), nullptr);
+            NETWinInfo info(QX11Info::connection(), win->winId(), QX11Info::appRootWindow(), nullptr, nullptr);
             info.setName(caption.toUtf8().constData());
         }
 #endif
