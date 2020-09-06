@@ -66,7 +66,7 @@
 
 static QByteArray origPluginPath;
 
-K_PLUGIN_FACTORY(KDMFactory, if (QGuiApplication::platformName() == QStringLiteral("xcb")) {
+K_PLUGIN_FACTORY(KDMFactory, if (true /*QGuiApplication::platformName() == QStringLiteral("xcb")*/) {
         registerPlugin<KDModule>();
         origPluginPath = qgetenv("QT_PLUGIN_PATH");
         // KDM will (likely) run without QT_PLUGIN_PATH set, so make certain we do, too.

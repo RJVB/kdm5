@@ -25,7 +25,7 @@
 
 #include <QHash>
 
-#include <kdialog.h>
+#include "kwidgetsaddons/kdialog.h"
 
 #include "ui_bgadvanced_ui.h"
 

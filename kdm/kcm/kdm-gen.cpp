@@ -124,7 +124,6 @@ KDMGeneralWidget::KDMGeneralWidget(QWidget *parent)
     colmenu->setWhatsThis(wtstr);
 
     box = new QGroupBox(i18nc("@title:group", "Fonts"), this);
-//     mlml->addSpacing(KDialog::spacingHint());
     mlml->addWidget(box);
     fl = new QFormLayout(box);
 

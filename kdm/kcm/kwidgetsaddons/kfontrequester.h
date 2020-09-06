@@ -11,8 +11,6 @@
 #include <QFont>
 #include <QString>
 
-#define KWIDGETSADDONS_EXPORT /**/
-
 class QLabel;
 class QPushButton;
 
@@ -30,7 +28,7 @@ class QPushButton;
  * @author Nadeem Hasan <nhasan@kde.org>
  *
  */
-class KWIDGETSADDONS_EXPORT KFontRequester : public QWidget
+class KFontRequester : public QWidget
 {
     Q_OBJECT
 

@@ -167,9 +167,10 @@ int KBackgroundRenderer::doBackground(bool quit)
         // some dithering may be needed even with bpb==15/16, so don't use tileWidth==1
         // for them
         // with tileWidth>2, repainting the desktop causes nasty effect (XFree86 4.1.0)
-        if (XQueryBestTile(QX11Info::display(), QX11Info::appRootWindow(), tile_val, tile_val,
-                           &tileWidth, &tileHeight) != Success)
+        if (!QX11Info::display() || XQueryBestTile(QX11Info::display(), QX11Info::appRootWindow(), tile_val, tile_val,
+                           &tileWidth, &tileHeight) != Success) {
             tileWidth = tileHeight = tile_val; // some defaults
+        }
     }
     switch (bgmode) {
 

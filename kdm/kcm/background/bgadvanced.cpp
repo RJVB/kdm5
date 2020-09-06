@@ -31,15 +31,12 @@
 
 #include <kconfig.h>
 #include <kcolorbutton.h>
-#include <klocale.h>
+#include <klocalizedstring.h>
 #include <kmessagebox.h>
 #include <kstandarddirs.h>
 
 #include "bgrender.h"
 #include "bgadvanced.h"
-
-#include <X11/Xlib.h>
-#include <fixx11h.h>
 
 /**** BGAdvancedDialog ****/
 

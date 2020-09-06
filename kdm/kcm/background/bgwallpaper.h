@@ -28,7 +28,7 @@
 #include <QDropEvent>
 
 class BGMultiWallpaperBase;
-#include <kdialog.h>
+#include "kwidgetsaddons/kdialog.h"
 
 class KBackgroundSettings;
 

@@ -23,11 +23,11 @@
 
 #include "kbackedcombobox.h"
 
-#include <KDialog>
-#include <KLineEdit>
-#include <KLocale>
-#include <KConfig>
-#include <KUrlRequester>
+#include "kwidgetsaddons/kdialog.h"
+#include <klineedit.h>
+#include <klocalizedstring.h>
+#include <kconfig.h>
+#include <kurlrequester.h>
 
 #include <QGroupBox>
 #include <QLabel>

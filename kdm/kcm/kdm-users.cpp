@@ -256,7 +256,6 @@ KDMUsersWidget::KDMUsersWidget(QWidget *parent)
     connect(rstuserbutton, SIGNAL(clicked()),
             SLOT(slotUnsetUserPix()));
     QGridLayout *hlpl = new QGridLayout(picGroup);
-//     hlpl->setSpacing(KDialog::spacingHint());
     hlpl->addWidget(userlabel, 0, 0);
     hlpl->addWidget(usercombo, 0, 1); // XXX this makes the layout too wide
     hlpl->addWidget(userbutton, 1, 0, 1, 2, Qt::AlignHCenter);

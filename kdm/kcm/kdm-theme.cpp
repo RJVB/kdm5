@@ -22,7 +22,6 @@
 
 #include "helper.h"
 
-#include <KDialog>
 #include <KLocale>
 #include <KMessageBox>
 #include <KProgressDialog>
@@ -87,8 +86,6 @@ KDMThemeWidget::KDMThemeWidget(QWidget *parent)
 {
     QGridLayout *ml = new QGridLayout(this);
     ml->setSizeConstraint(QLayout::SetMinAndMaxSize);
-    ml->setSpacing(KDialog::spacingHint());
-    ml->setMargin(KDialog::marginHint());
 
     themeWidget = new QTreeWidget(this);
     themeWidget->setHeaderLabels(QStringList()

@@ -20,12 +20,11 @@
 
 #include "kdm-conv.h"
 
-#include <KColorScheme>
-#include <KComboBox>
-#include <KDialog>
-#include <KLocale>
-#include <KConfig>
-#include <KConfigGroup>
+#include <kcolorscheme.h>
+#include <kcombobox.h>
+#include <klocalizedstring.h>
+#include <kconfig.h>
+#include <kconfiggroup.h>
 
 #include <QButtonGroup>
 #include <QCheckBox>
@@ -60,7 +59,6 @@ KDMConvenienceWidget::KDMConvenienceWidget(QWidget *parent)
     alGroup->setCheckable(true);
     alGroup->setSizePolicy(vpref);
     QVBoxLayout *laygroup2 = new QVBoxLayout(alGroup);
-    laygroup2->setSpacing(KDialog::spacingHint());
 
     alGroup->setWhatsThis(i18n("Turn on the auto-login feature."
                                " This applies only to KDM's graphical login."
@@ -73,7 +71,6 @@ KDMConvenienceWidget::KDMConvenienceWidget(QWidget *parent)
     u_label->setBuddy(userlb);
     QHBoxLayout *hlpl1 = new QHBoxLayout();
     laygroup2->addItem(hlpl1);
-    hlpl1->setSpacing(KDialog::spacingHint());
     hlpl1->addWidget(u_label);
     hlpl1->addWidget(userlb);
     hlpl1->addStretch(1);
@@ -109,7 +106,6 @@ KDMConvenienceWidget::KDMConvenienceWidget(QWidget *parent)
     buttonGroup->addButton(ppRadio);
     buttonGroup->addButton(spRadio);
     QVBoxLayout *laygroup5 = new QVBoxLayout(puGroup);
-    laygroup5->setSpacing(KDialog::spacingHint());
     laygroup5->addWidget(npRadio);
     laygroup5->addWidget(ppRadio);
 
@@ -123,7 +119,6 @@ KDMConvenienceWidget::KDMConvenienceWidget(QWidget *parent)
     puserlb->setWhatsThis(wtstr);
     QBoxLayout *hlpl = new QHBoxLayout();
     laygroup5->addItem(hlpl);
-    hlpl->setSpacing(KDialog::spacingHint());
     hlpl->setMargin(0);
     hlpl->addWidget(spRadio);
     hlpl->addWidget(puserlb);
@@ -143,7 +138,6 @@ KDMConvenienceWidget::KDMConvenienceWidget(QWidget *parent)
 
     npGroup = new QGroupBox(i18n("Enable Password-&Less Logins"), this);
     QVBoxLayout *laygroup3 = new QVBoxLayout(npGroup);
-    laygroup3->setSpacing(KDialog::spacingHint());
 
     npGroup->setCheckable(true);
 
@@ -167,7 +161,6 @@ KDMConvenienceWidget::KDMConvenienceWidget(QWidget *parent)
 
     btGroup = new QGroupBox(i18nc("@title:group", "Miscellaneous"), this);
     QVBoxLayout *laygroup4 = new QVBoxLayout(btGroup);
-    laygroup4->setSpacing(KDialog::spacingHint());
 
     cbarlen = new QCheckBox(i18n("Automatically log in again after &X server crash"), btGroup);
     cbarlen->setWhatsThis(i18n(
