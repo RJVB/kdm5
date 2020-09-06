@@ -8,7 +8,7 @@ add_subdirectory( sessions )
 
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../kcm/background
-	${KDEBASE_WORKSPACE_SOURCE_DIR}/libs/kdm
+	${KDM_SOURCE_DIR}/libs/kdm
 	${QIMAGEBLITZ_INCLUDES}
 )
 
