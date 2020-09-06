@@ -151,9 +151,7 @@ Positioner::resizeEvent(QResizeEvent *event)
 
     m_frame->setGeometry(0, 0, rs.width() + fw, rs.height() + fw);
     m_frame->resize(size());
-#ifdef KDM_THEMEABLE
     m_screen->setGeometry(previewRect());
-#endif
 
     updateHandle();
 }
