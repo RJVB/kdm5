@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "kdmconfig.h"
 #include "kdm_greet.h"
 
-#include <klocale.h>
+#include <klocalizedstring.h>
 
 #include <QApplication>
 #include <QLabel>

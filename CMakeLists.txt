@@ -56,7 +56,7 @@ add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0)
 find_package(KF5 REQUIRED COMPONENTS
     Auth Config ConfigWidgets Crash DBusAddons DocTools 
     GuiAddons I18n IconThemes 
-    KCMUtils KIO Parts Plasma Wallet )
+    KCMUtils KIO Parts Plasma Pty Wallet )
 
 # needed for set_package_properties macro
 find_package(KF5KDE4Support REQUIRED NO_MODULE)

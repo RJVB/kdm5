@@ -274,7 +274,9 @@ void KVirtualBGRenderer::enableTiling(bool enable)
 
 MyApplication::MyApplication(int &argc, char **argv)
     : QApplication(argc, argv)
-{}
+{
+    setApplicationVersion(QStringLiteral(KDM5_VERSION));
+}
 
 void MyApplication::init(const QString &confFile)
 {
@@ -332,6 +334,8 @@ MyApplication::slotTimeout()
 int
 main(int argc, char *argv[])
 {
+    MyApplication app(argc, argv);
+
     QCommandLineParser parser;
     
     KLocalizedString::setApplicationDomain("kdmgreet");
@@ -343,10 +347,11 @@ main(int argc, char *argv[])
     about.setupCommandLine(&parser);
 
     parser.addPositionalArgument(QStringLiteral("config"), i18n("Name of the configuration file"));
-
-    MyApplication app(argc, argv);
+    parser.addVersionOption();
 
     parser.process(app);
+    about.processCommandLine(&parser);
+
     const auto args = parser.positionalArguments();
     if (args.count() > 0) {
         app.init(args.first());

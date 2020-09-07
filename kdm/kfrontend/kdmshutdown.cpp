@@ -26,14 +26,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "kdm_greet.h"
 #include "utils.h"
 
-#include <kdialog.h>
-#include <klocale.h>
+#include <klocalizedstring.h>
 #include <kprocess.h>
 #include <kseparator.h>
-#include <kstandarddirs.h>
-#include <KStandardGuiItem>
+#include <kguiitem.h>
+#include <kstandardguiitem.h>
 #include <kuser.h>
 
+#include <QStandardPaths>
 #include <QAction>
 #include <QApplication>
 #include <QCheckBox>
@@ -110,7 +110,8 @@ KDMShutdownBase::complete(QWidget *prevWidget)
     box->addLayout(hlay);
     hlay->addStretch(1);
     if (mayOk) {
-        okButton = new KPushButton(KStandardGuiItem::ok(), this);
+        okButton = new QPushButton(this);
+        KStandardGuiItem::assign(okButton, KStandardGuiItem::StandardItem::Ok);
         okButton->setSizePolicy(fp);
         okButton->setDefault(true);
         hlay->addWidget(okButton);
@@ -118,14 +119,15 @@ KDMShutdownBase::complete(QWidget *prevWidget)
         connect(okButton, SIGNAL(clicked()), SLOT(accept()));
     }
     if (maySched) {
-        KPushButton *schedButton =
-            new KPushButton(KGuiItem(i18nc("@action:inmenu verb", "&Schedule...")), this);
+        QPushButton *schedButton = new QPushButton(this);
+        KGuiItem::assign(schedButton, KGuiItem(i18nc("@action:inmenu verb", "&Schedule...")));
         schedButton->setSizePolicy(fp);
         hlay->addWidget(schedButton);
         hlay->addStretch(1);
         connect(schedButton, SIGNAL(clicked()), SLOT(slotSched()));
     }
-    cancelButton = new KPushButton(KStandardGuiItem::cancel(), this);
+    cancelButton = new QPushButton(this);
+    KStandardGuiItem::assign(cancelButton, KStandardGuiItem::StandardItem::Cancel);
     cancelButton->setSizePolicy(fp);
     if (!mayOk)
         cancelButton->setDefault(true);
@@ -442,8 +444,9 @@ KDMRadioButton::mouseDoubleClickEvent(QMouseEvent *)
 
 
 KDMDelayedPushButton::KDMDelayedPushButton(const KGuiItem &item, QWidget *parent)
-    : inherited(item, parent)
+    : inherited(parent)
 {
+    KGuiItem::assign(this, item);
     popt.setSingleShot(true);
     popt.setInterval(style()->styleHint(QStyle::SH_ToolButton_PopupDelay, 0, this));
 }
@@ -467,7 +470,8 @@ KDMSlimShutdown::KDMSlimShutdown(QWidget *_parent)
     QFrame *lfrm = new QFrame(this);
     hbox->addWidget(lfrm, Qt::AlignCenter);
     QLabel *icon = new QLabel(lfrm);
-    icon->setPixmap(QPixmap(KStandardDirs::locate("data", "kdm/pics/shutdown.png")));
+    icon->setPixmap(QPixmap(QStandardPaths::locate(QStandardPaths::GenericDataLocation,
+                                                   QStringLiteral("kdm/pics/shutdown.png"))));
     icon->setFixedSize(icon->sizeHint());
     lfrm->setFixedSize(icon->sizeHint());
 
@@ -476,15 +480,12 @@ KDMSlimShutdown::KDMSlimShutdown(QWidget *_parent)
 
     buttonlay->addStretch(1);
 
-    KPushButton *btnHalt = new
-    KPushButton(KGuiItem(i18n("&Turn Off Computer"), "system-shutdown"), this);
+    QPushButton *btnHalt = new QPushButton(this);
+    KGuiItem::assign(btnHalt, KGuiItem(i18n("&Turn Off Computer"), "system-shutdown"));
     buttonlay->addWidget(btnHalt);
     connect(btnHalt, SIGNAL(clicked()), SLOT(slotHalt()));
 
-    buttonlay->addSpacing(KDialog::spacingHint());
-
-    KDMDelayedPushButton *btnReboot = new
-    KDMDelayedPushButton(KGuiItem(i18n("&Restart Computer"), "system-reboot"), this);
+    KDMDelayedPushButton *btnReboot = new KDMDelayedPushButton(KGuiItem(i18n("&Restart Computer"), "system-reboot"), this);
     buttonlay->addWidget(btnReboot);
     connect(btnReboot, SIGNAL(clicked()), SLOT(slotReboot()));
 
@@ -504,8 +505,8 @@ KDMSlimShutdown::KDMSlimShutdown(QWidget *_parent)
     buttonlay->addStretch(1);
 
     if (_scheduledSd != SHUT_NEVER) {
-        KPushButton *btnSched = new
-        KPushButton(KGuiItem(i18nc("@action:button verb", "&Schedule...")), this);
+        QPushButton *btnSched = new QPushButton(this);
+        KGuiItem::assign(btnSched, KGuiItem(i18nc("@action:button verb", "&Schedule...")));
         buttonlay->addWidget(btnSched);
         connect(btnSched, SIGNAL(clicked()), SLOT(slotSched()));
 
@@ -516,11 +517,10 @@ KDMSlimShutdown::KDMSlimShutdown(QWidget *_parent)
 
     buttonlay->addSpacing(0);
 
-    KPushButton *btnBack = new KPushButton(KStandardGuiItem::cancel(), this);
+    QPushButton *btnBack = new QPushButton(this);
+    KGuiItem::assign(btnBack, KStandardGuiItem::cancel());
     buttonlay->addWidget(btnBack);
     connect(btnBack, SIGNAL(clicked()), SLOT(reject()));
-
-    buttonlay->addSpacing(KDialog::spacingHint());
 }
 
 void

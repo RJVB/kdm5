@@ -75,7 +75,12 @@ endif (WITH_KDM_XCONSOLE)
 macro_add_file_dependencies(kdmconfig.h ${confci})
 add_executable(kdm_greet ${kdm_greet_SRCS})
 ecm_mark_nongui_executable(kdm_greet)
-target_link_libraries(kdm_greet ${KDE4_KDEUI_LIBS} ${QT_QTXML_LIBRARY} ${X11_X11_LIB} ${POSIX4_LIBRARIES})
+target_link_libraries(kdm_greet
+    KF5::CoreAddons KF5::ConfigCore
+    KF5::I18n KF5::WidgetsAddons KF5::KDELibs4Support
+    Qt5::Core Qt5::Widgets Qt5::Network Qt5::Svg Qt5::X11Extras
+    ${QT_QTXML_LIBRARY}
+    ${X11_X11_LIB} ${POSIX4_LIBRARIES})
 if (X11_XTest_FOUND)
   target_link_libraries(kdm_greet ${X11_XTest_LIB})
 endif (X11_XTest_FOUND)
@@ -99,7 +104,7 @@ add_executable(krootimage ${krootimage_SRCS})
 ecm_mark_nongui_executable(krootimage)
 target_link_libraries(krootimage
     KF5::CoreAddons KF5::ConfigCore
-    KF5::I18n KF5::KDELibs4Support
+    KF5::I18n KF5::WidgetsAddons KF5::KDELibs4Support
     Qt5::Core Qt5::Widgets Qt5::Network Qt5::Svg Qt5::X11Extras
     ${X11_LIBRARIES} ${QIMAGEBLITZ_LIBRARIES})
 install(TARGETS krootimage DESTINATION ${LIBEXEC_INSTALL_DIR})

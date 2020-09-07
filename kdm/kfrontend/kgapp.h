@@ -38,7 +38,7 @@ class GreeterApp : public QApplication {
     GreeterApp(int &argc, char **argv);
     void markBusy();
     void enableSendInteract() { sendInteract = true; }
-    virtual bool x11EventFilter(XEvent *);
+    virtual bool x11EventFilter(void *);
 
   public Q_SLOTS:
     void markReady();

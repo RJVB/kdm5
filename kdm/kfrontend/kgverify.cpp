@@ -33,20 +33,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "themer/kdmitem.h"
 #endif
 
-#include <KColorScheme>
-#include <kguiitem.h>
-#include <klibrary.h>
-#include <klocale.h>
-#include <kpushbutton.h>
+#include <klocalizedstring.h>
+#include <kcolorscheme.h>
 #include <krandom.h>
+#include <kpluginloader.h>
+#include <kstandardguiitem.h>
 #include <kseparator.h>
-#include <KStandardGuiItem>
 
+#include <QDebug>
+#include <QLibrary>
 #include <QAction>
 #include <QApplication>
 #include <QEvent>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QPushButton>
 #include <QMenu>
 #include <QSocketNotifier>
 #include <QX11Info>
@@ -953,12 +954,13 @@ KGVerify::init(const QStringList &plugins)
 
     foreach (const QString& pg, plugins) {
         GreeterPluginHandle plugin;
-        KLibrary *lib = new KLibrary(pg[0] == '/' ? pg : "kgreet_" + pg);
-        if (lib->fileName().isEmpty()) {
+        const auto plugFileName = KPluginLoader::findPlugin(pg[0] == '/' ? pg : "kgreet_" + pg);
+        if (plugFileName.isEmpty()) {
             logError("GreeterPlugin %s does not exist\n", qPrintable(pg));
-            delete lib;
             continue;
         }
+        QLibrary *lib = new QLibrary(plugFileName);
+        qWarning() << "Plugin" << pg << "=>" << lib->fileName();
         uint i, np = greetPlugins.count();
         for (i = 0; i < np; i++)
             if (greetPlugins[i].library->fileName() == lib->fileName()) {
@@ -972,7 +974,7 @@ KGVerify::init(const QStringList &plugins)
             continue;
         }
         plugin.library = lib;
-        plugin.info = (KGreeterPluginInfo *)lib->resolveSymbol("kgreeterplugin_info");
+        plugin.info = (KGreeterPluginInfo *)lib->resolve("kgreeterplugin_info");
         if (!plugin.info) {
             logError("GreeterPlugin %s (%s) is no valid greet widget plugin\n",
                      qPrintable(pg), qPrintable(lib->fileName()));
@@ -1001,8 +1003,9 @@ void
 KGVerify::done()
 {
     for (int i = 0; i < greetPlugins.count(); i++) {
-        if (greetPlugins[i].info->done)
+        if (greetPlugins[i].info->done) {
             greetPlugins[i].info->done();
+        }
         greetPlugins[i].library->unload();
     }
 }
@@ -1161,10 +1164,12 @@ KGChTok::KGChTok(QWidget *_parent, const QString &user,
     , verify(0)
 {
     QSizePolicy fp(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    okButton = new KPushButton(KStandardGuiItem::ok(), this);
+    okButton = new QPushButton(this);
+    KStandardGuiItem::assign(okButton, KStandardGuiItem::StandardItem::Ok);
     okButton->setSizePolicy(fp);
     okButton->setDefault(true);
-    cancelButton = new KPushButton(KStandardGuiItem::cancel(), this);
+    cancelButton = new QPushButton(this);
+    KStandardGuiItem::assign(cancelButton, KStandardGuiItem::StandardItem::Cancel);
     cancelButton->setSizePolicy(fp);
 
     verify = new KGStdVerify(this, this, cancelButton, user, pluginList, func, ctx);

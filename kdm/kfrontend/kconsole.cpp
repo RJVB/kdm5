@@ -25,8 +25,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "kdmconfig.h"
 #include "kdm_greet.h"
 
-#include <klocale.h>
-#include <kpty.h>
+#include <klocalizedstring.h>
+#include <KPty/kpty.h>
 
 #include <QSocketNotifier>
 #include <QScrollBar>
@@ -82,12 +82,14 @@ KConsole::openConsole()
     static const char on = 1;
 #endif
 
+#ifdef WITH_KDM_XCONSOLE
     if (*_logSource) {
         if ((fd = open(_logSource, O_RDONLY | O_NONBLOCK)) >= 0)
             goto gotcon;
         logError("Cannot open log source %s, "
                  "falling back to /dev/console.\n", _logSource);
     }
+#endif
 
     pty = new KPty;
     if (!pty->open()) {

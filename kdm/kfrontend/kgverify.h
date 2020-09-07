@@ -40,8 +40,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 class KdmThemer;
 #endif
 
-class KLibrary;
-class KPushButton;
+class QLibrary;
+class QPushButton;
 class QMenu;
 class QSocketNotifier;
 
@@ -82,7 +82,7 @@ class KGVerifyHandler {
 };
 
 struct GreeterPluginHandle {
-    KLibrary *library;
+    QLibrary *library;
     KGreeterPluginInfo *info;
     QAction *action;
 };
@@ -246,7 +246,7 @@ class KGChTok : public FDialog, public KGVerifyHandler {
     void accept();
 
   private:
-    KPushButton *okButton, *cancelButton;
+    QPushButton *okButton, *cancelButton;
     KGStdVerify *verify;
 
   public: // from KGVerifyHandler

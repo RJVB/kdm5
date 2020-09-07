@@ -36,13 +36,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #endif
 #include "utils.h"
 
+#include <kaboutdata.h>
 #include <kcrash.h>
-#include <kglobalsettings.h>
-#include <kcomponentdata.h>
 #include <kprocess.h>
 #include <kconfig.h>
+#include <kconfiggroup.h>
+#include <kcolorscheme.h>
+
+#include <kglobal.h>
+#include <kglobalsettings.h>
 #include <kstandarddirs.h>
 
+#include <QDebug>
 #include <QDesktopWidget>
 #include <QPainter>
 #include <QX11Info>
@@ -121,9 +126,10 @@ GreeterApp::timerEvent(QTimerEvent *ev)
 }
 
 bool
-GreeterApp::x11EventFilter(XEvent * ev)
+GreeterApp::x11EventFilter(void * evp)
 {
     KeySym sym;
+    XEvent *ev = static_cast<XEvent*>(evp);
 
     if (_grabInput) {
         switch (ev->type) {
@@ -348,16 +354,43 @@ main(int argc ATTR_UNUSED, char **argv)
     static char *fakeArgv[] = { (char *)"kdmgreet", 0 };
     static int fakeArgc = as(fakeArgv) - 1;
 
+    KAboutData about(fakeArgv[0], fakeArgv[0], QStringLiteral(KDM5_VERSION),
+                       "Login Manager for KDE", KAboutLicense::GPL,
+                       "(c) 1996-2010 The KDM Authors", QString(),
+                       QStringLiteral("http://developer.kde.org/~ossi/sw/kdm.html"));
+
     KCrash::setFlags(KCrash::KeepFDs | KCrash::SaferDialog | KCrash::AlwaysDirectly);
-    KCrash::setApplicationName(QLatin1String(fakeArgv[0]));
     KCrash::setDrKonqiEnabled(true);
     XSetIOErrorHandler(xIOErr);
-    KComponentData inst(fakeArgv[0]);
-    foreach (const QString &dir, KGlobal::dirs()->resourceDirs("qtplugins"))
+    foreach (const QString &dir, KGlobal::dirs()->resourceDirs("qtplugins")) {
+        qWarning() << "addLibraryPath" << dir;
         QCoreApplication::addLibraryPath(dir);
+    }
     GreeterApp app(fakeArgc, fakeArgv);
     initQAppConfig();
-    KGlobalSettings::self()->activate(KGlobalSettings::ApplySettings);
+    // KGlobalSettings::self()->activate(KGlobalSettings::ApplySettings) :
+    {
+        KConfigGroup cg(KSharedConfig::openConfig(), "KDE");
+
+        int num = cg.readEntry("CursorBlinkRate", QApplication::cursorFlashTime());
+        if ((num != 0) && (num < 200)) {
+            num = 200;
+        }
+        if (num > 2000) {
+            num = 2000;
+        }
+        QApplication::setCursorFlashTime(num);
+        num = cg.readEntry("DoubleClickInterval", QApplication::doubleClickInterval());
+        QApplication::setDoubleClickInterval(num);
+        num = cg.readEntry("StartDragTime", QApplication::startDragTime());
+        QApplication::setStartDragTime(num);
+        num = cg.readEntry("StartDragDist", QApplication::startDragDistance());
+        QApplication::setStartDragDistance(num);
+        num = cg.readEntry("WheelScrollLines", QApplication::wheelScrollLines());
+        QApplication::setWheelScrollLines(num);
+        bool showIcons = cg.readEntry("ShowIconsInMenuItems", !QApplication::testAttribute(Qt::AA_DontShowIconsInMenus));
+        QApplication::setAttribute(Qt::AA_DontShowIconsInMenus, !showIcons);
+    }
 
     Display *dpy = QX11Info::display();
     QDesktopWidget *dw = app.desktop();
@@ -370,7 +403,7 @@ main(int argc ATTR_UNUSED, char **argv)
     _colorScheme = KStandardDirs::locate("data", "color-schemes/" + _colorScheme + ".colors");
     if (!_colorScheme.isEmpty()) {
         KSharedConfigPtr config = KSharedConfig::openConfig(_colorScheme, KConfig::SimpleConfig);
-        app.setPalette(KGlobalSettings::createApplicationPalette(config));
+        app.setPalette(KColorScheme::createApplicationPalette(config));
     }
 
 #ifdef KDM_THEMEABLE

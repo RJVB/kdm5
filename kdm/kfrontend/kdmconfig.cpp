@@ -27,8 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "utils.h"
 
 #include <kconfiggroup.h>
-#include <kglobal.h>
-#include <klocale.h>
+#include <ksharedconfig.h>
+#include <klocalizedstring.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -141,7 +141,7 @@ void initQAppConfig(void)
 {
     CONF_GREET_INIT_QAPP
 
-    KConfigGroup cfg(KGlobal::config(), "General");
+    KConfigGroup cfg(KSharedConfig::openConfig(), "General");
     cfg.writeEntry("nopaletteChange", true);
     cfg.writeEntry("font", *_normalFont);
     if (!_GUIStyle.isEmpty())

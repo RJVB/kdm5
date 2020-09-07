@@ -26,14 +26,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "kdmconfig.h"
 #include "kdm_greet.h"
 
-#include <KGuiItem>
-#include <KPushButton>
+#include <kstandardguiitem.h>
 
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QFrame>
 #include <QGridLayout>
 #include <QLabel>
+#include <QPushButton>
 #include <QMouseEvent>
 #include <QX11Info>
 
@@ -172,7 +172,8 @@ KFMsgBox::KFMsgBox(QWidget *parent, QMessageBox::Icon type, const QString &text)
     QLabel *label1 = new QLabel(this);
     label1->setPixmap(QMessageBox::standardIcon(type));
     QLabel *label2 = new QLabel(text, this);
-    KPushButton *button = new KPushButton(KStandardGuiItem::ok(), this);
+    QPushButton *button = new QPushButton(this);
+    KStandardGuiItem::assign(button, KStandardGuiItem::StandardItem::Ok);
     button->setDefault(true);
     button->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
     connect(button, SIGNAL(clicked()), SLOT(accept()));

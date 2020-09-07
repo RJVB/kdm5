@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "kdmconfig.h" // for HAVE_VTS
 #include "kgverify.h"
 
-#include <kpushbutton.h>
+#include <QPushButton>
 
 #include <QRadioButton>
 
@@ -136,9 +136,9 @@ class KDMRadioButton : public QRadioButton {
 
 };
 
-class KDMDelayedPushButton : public KPushButton {
+class KDMDelayedPushButton : public QPushButton {
     Q_OBJECT
-    typedef KPushButton inherited;
+    typedef QPushButton inherited;
 
   public:
     KDMDelayedPushButton(const KGuiItem &item, QWidget *parent);
