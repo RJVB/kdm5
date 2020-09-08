@@ -33,9 +33,20 @@ set(QT_MIN_VERSION "5.9.0")
 # find_package(KDE4 4.9.4 REQUIRED)
 # include(KDE4Defaults)
 
-option(WITH_XINERAMA "Xinerama support for multi-headed X displays" ON)
+option(KDM_MULTIHEAD_SUPPORT "Xinerama support for multi-headed X displays" ON)
 
 option(KDM_THEMEABLE "Build KDM with themeing support" OFF)
+
+option(KDM5_RPCAUTH "Use Sun's secure RPC for Xauth cookies in KDM" OFF)
+option(KDM5_KRB5AUTH "Use Kerberos5 for Xauth cookies in KDM" OFF)
+option(KDM5_KERBEROS4 "Compile KDM with Kerberos v4 (sic!) support" OFF)
+if (KDM5_KERBEROS4)
+    option(KDM_AFS "Compile KDM with AFS support" OFF)
+endif()
+
+option(KDM5_XDMCP "Build KDM with XDMCP support" ON)
+option(KDM5_XCONSOLE "Build KDM with built-in xconsole" OFF)
+
 
 #TODO: this was coming from KDELibs4, we need a replacement
 set(KDE_PLATFORM_PROFILE "Desktop")

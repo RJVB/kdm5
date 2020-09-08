@@ -78,11 +78,11 @@ macro_bool_to_01(X11_Xcomposite_FOUND HAVE_XCOMPOSITE) # kicker, kwin
 macro_bool_to_01(X11_Xcursor_FOUND HAVE_XCURSOR) # many uses
 macro_bool_to_01(X11_Xdamage_FOUND HAVE_XDAMAGE) # kwin
 macro_bool_to_01(X11_Xfixes_FOUND HAVE_XFIXES) # klipper, kicker, kwin
-if(WITH_XINERAMA)
+if(KDM_MULTIHEAD_SUPPORT)
     macro_bool_to_01(X11_Xinerama_FOUND HAVE_XINERAMA)
-else(WITH_XINERAMA)
+else(KDM_MULTIHEAD_SUPPORT)
     set(HAVE_XINERAMA 0)
-endif(WITH_XINERAMA)
+endif(KDM_MULTIHEAD_SUPPORT)
 macro_bool_to_01(X11_Xrandr_FOUND HAVE_XRANDR) # kwin
 macro_bool_to_01(X11_Xrender_FOUND HAVE_XRENDER) # kcontrol/style, kicker
 macro_bool_to_01(X11_xf86misc_FOUND HAVE_XF86MISC) # kdesktop and kcontrol/lock
