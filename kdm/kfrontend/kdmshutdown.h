@@ -74,7 +74,7 @@ class KDMShutdownBase : public FDialog, public KGVerifyHandler {
     void slotActivatePlugMenu();
 
   private:
-    KPushButton *okButton, *cancelButton;
+    QPushButton *okButton, *cancelButton;
     QLabel *rootlab;
     KGStdVerify *verify;
     int needRoot, uid;

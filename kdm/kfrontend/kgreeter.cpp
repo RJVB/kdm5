@@ -33,13 +33,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "themer/kdmlabel.h"
 #endif
 
-#include <KColorScheme>
-#include <KConfigGroup>
-#include <klocale.h>
+#include <kcolorscheme.h>
+#include <kconfiggroup.h>
+#include <klocalizedstring.h>
 #include <kseparator.h>
-#include <kstandarddirs.h>
 #include <kstringhandler.h>
 
+#include <QStandardPaths>
 #include <QAction>
 #include <QBuffer>
 #include <QDir>
@@ -477,7 +477,7 @@ KGreeter::insertSessions()
                             dsk.readEntry("Name"),
                             (dsk.readEntry("Hidden", false) ||
                              (dsk.hasKey("TryExec") &&
-                              KStandardDirs::findExe(
+                              QStandardPaths::findExecutable(
                                   dsk.readEntry("TryExec")).isEmpty())),
                             dsk.readEntry("Exec").toLatin1());
             }
