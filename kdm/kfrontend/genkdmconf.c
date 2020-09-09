@@ -1595,7 +1595,8 @@ static void
 upd_servervts(Entry *ce, Section *cs ATTR_UNUSED)
 {
     if (!ce->active) { /* there is only the Global one */
-#ifdef __linux__ /* XXX actually, sysvinit */
+/* XXX actually, sysvinit */
+#if defined(__linux__) || defined(__FreeBSD_kernel__)
         getInitTab();
         ASPrintf((char **)&ce->value, "-%d", maxTTY + 1);
         ce->active = ce->written = True;
@@ -1607,14 +1608,19 @@ static void
 upd_consolettys(Entry *ce, Section *cs ATTR_UNUSED)
 {
     if (!ce->active) { /* there is only the Global one */
-#ifdef __linux__ /* XXX actually, sysvinit */
+/* XXX actually, sysvinit */
+#if defined(__linux__) || defined(__FreeBSD_kernel__)
         char *buf;
         int i;
 
         getInitTab();
         for (i = 0, buf = 0; i < 16; i++)
             if (TTYmask & (1 << i))
+#if defined(__linux__)
                 strCat(&buf, ",tty%d", i + 1);
+#elif defined(__FreeBSD_kernel__)
+                strCat(&buf, ",ttyv%x", i);
+#endif
         if (buf) {
             ce->value = buf + 1;
             ce->active = ce->written = True;
@@ -3246,7 +3252,7 @@ int main(int argc, char **argv)
             }
         }
     }
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD_kernel__)
     if (!stat("/etc/debian_version", &st)) { /* debian */
         defminuid = "1000";
         defmaxuid = "29999";

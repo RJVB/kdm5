@@ -54,6 +54,15 @@ from the copyright holder.
 # include <sys/utsname.h>
 #endif
 
+#ifdef HAVE_VTS
+#  include <sys/ioctl.h>
+#  if defined(__linux__)
+#    include <linux/vt.h>
+#  elif defined(__FreeBSD_kernel__)
+#    include <sys/consio.h>
+#  endif
+#endif
+
 void *
 Calloc(size_t nmemb, size_t size)
 {
@@ -663,6 +672,29 @@ hexToBinary(char *out, const char *in)
 
 #undef atox
 
+#ifdef HAVE_VTS
+/* Get next free VT. Works only on virtual terminal devices */
+static int
+getNextFreeVT(const char *tty)
+{
+    int fd, vt;
+    char *dev;
+
+    vt = -1;
+    dev = (char*) Malloc(strlen(tty) + 6);
+    sprintf(dev, "/dev/%s", tty);
+
+    fd = open(dev, O_RDONLY);
+    if (fd >= 0) {
+        if (ioctl(fd, VT_OPENQRY, &vt))
+            vt = -1;
+        close(fd);
+    }
+    free(dev);
+    return vt;
+}
+#endif
+
 /* X -from ip6-addr does not work here, so i don't know whether this is needed.
 #define IP6_MAGIC
 */
@@ -681,6 +713,10 @@ listSessions(int flags, struct display *d, void *ctx,
     struct utmp ut[1];
 #else
     STRUCTUTMP *ut;
+#endif
+#ifdef HAVE_VTS
+    int con_fvt;
+    con_fvt = -2;
 #endif
 
     for (di = displays; di; di = di->next)
@@ -713,11 +749,19 @@ listSessions(int flags, struct display *d, void *ctx,
                 if (!(flags & lstRemote))
                     continue;
             } else {
+                if (!*ut->ut_line)
+                    continue;
                 /* hack around broken konsole which does not set ut_host. */
+#ifdef HAVE_VTS
+                if (con_fvt == -2)
+                    con_fvt = getNextFreeVT("console");
+                if (con_fvt >= 0 && con_fvt != getNextFreeVT(ut->ut_line))
+                    continue;
+#else
                 /* this check is probably linux-specific. */
-                /* alternatively we could open the device and try VT_OPENQRY. */
                 if (memcmp(ut->ut_line, "tty", 3) || !isdigit(ut->ut_line[3]))
                     continue;
+#endif
             }
             if (strNChrCnt(ut->ut_line, sizeof(ut->ut_line), ':'))
                 continue; /* x login */

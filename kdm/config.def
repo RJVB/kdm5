@@ -867,7 +867,7 @@ Description:
  This option is for operating systems (<acronym>OS</acronym>s) with support
  for virtual terminals (<acronym>VT</acronym>s), by both &kdm; and the
  <acronym>OS</acronym>s itself.
- Currently this applies only to Linux.
+ Currently this applies only to Linux and kFreeBSD.
  </para><para>
  When &kdm; switches to console mode, it starts monitoring all
  <acronym>TTY</acronym> lines listed here (without the leading

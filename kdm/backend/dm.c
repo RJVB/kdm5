@@ -47,7 +47,13 @@ from the copyright holder.
 
 #ifdef HAVE_VTS
 # include <sys/ioctl.h>
+#if defined(__linux__)
 # include <sys/vt.h>
+#elif defined(__FreeBSD_kernel__)
+# include <sys/consio.h>
+# include <sys/tty.h>
+# include <sys/sysctl.h>
+#endif
 #endif
 
 static void sigHandler(int n);
@@ -349,7 +355,12 @@ updateNow(void)
 int
 TTYtoVT(const char *tty)
 {
-    return memcmp(tty, "tty", 3) ? 0 : atoi(tty + 3);
+    if (!memcmp(tty, "ttyv", 4)) /* FreeBSD, tty no is in hex */
+        return (int) strtoul(tty+4, NULL, 16);
+    else if (!memcmp(tty, "tty", 3)) /* Linux */
+        return atoi(tty + 3);
+    else
+        return 0;
 }
 
 int
@@ -1051,9 +1062,15 @@ reapChildren(void)
                     } else {
                         int con = open("/dev/console", O_RDONLY);
                         if (con >= 0) {
+                            int activevt;
+#if defined(__linux__)
                             struct vt_stat vtstat;
                             ioctl(con, VT_GETSTATE, &vtstat);
-                            if (vtstat.v_active == d->serverVT) {
+                            activevt = vtstat.v_active;
+#elif defined(__FreeBSD_kernel__)
+                            ioctl(con, VT_GETACTIVE, &activevt);
+#endif
+                            if (activevt == d->serverVT) {
                                 int vt = 1;
                                 struct display *di;
                                 for (di = displays; di; di = di->next)
@@ -1066,7 +1083,9 @@ reapChildren(void)
                                         vt = di->serverVT;
                                 ioctl(con, VT_ACTIVATE, vt);
                             }
+#ifdef __linux__
                             ioctl(con, VT_DISALLOCATE, d->serverVT);
+#endif
                             close(con);
                         }
                     }
@@ -1339,16 +1358,41 @@ static int activeVTs;
 static int
 getBusyVTs(void)
 {
-    struct vt_stat vtstat;
-    int con;
-
     if (activeVTs == -1) {
+#if defined(__linux__)
+        struct vt_stat vtstat;
+        int con;
+
         vtstat.v_state = 0;
         if ((con = open("/dev/console", O_RDONLY)) >= 0) {
             ioctl(con, VT_GETSTATE, &vtstat);
             close(con);
         }
         activeVTs = vtstat.v_state;
+#elif defined(__FreeBSD_kernel__)
+        struct xtty *ttys;
+        size_t s, i, firstvt;
+        struct stat st;
+
+        activeVTs = 0;
+        firstvt = ~0;
+        /* We need rdev of the first tty */
+        if (stat("/dev/ttyv0", &st))
+            firstvt = 0; /* If stat fails, 0 should be safe default */
+
+        if (!sysctlbyname("kern.ttys", NULL, &s, NULL, 0)) {
+            ttys = (struct xtty *) malloc(s);
+            sysctlbyname("kern.ttys", ttys, &s, NULL, 0);
+            for (i = 0; (i < s / sizeof(struct xtty)) &&
+                (i < sizeof(activeVTs) * 8); i++)
+            {
+                if (firstvt == ~0 && st.st_rdev == ttys[i].xt_dev)
+                    firstvt = i;
+                if (i >= firstvt)
+                    activeVTs |= !!(ttys[i].xt_flags & TF_OPENED) << (i - firstvt);
+            }
+        }
+#endif
     }
     return activeVTs;
 }

@@ -53,7 +53,7 @@ from the copyright holder.
 # define USE_SYSLOG
 #endif
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD_kernel__)
 /* This needs to be run-time configurable, additionally. */
 # define HAVE_VTS
 #endif

@@ -1349,7 +1349,11 @@ startClient(volatile int *pid)
     
 # ifdef HAVE_VTS
     if (td->serverVT > 0)
+# if defined(__linux__)
         sprintf(ckDeviceBuf, "/dev/tty%d", td->serverVT);
+# elif defined(__FreeBSD_kernel__)
+        sprintf(ckDeviceBuf, "/dev/ttyv%x", td->serverVT);
+# endif
 # endif
     isLocal = ((td->displayType & d_location) == dLocal);
 # ifdef XDMCP
