@@ -97,6 +97,11 @@ GreeterApp::GreeterApp(int &argc, char **argv) :
         pingTimerId = 0;
 }
 
+GreeterApp::~GreeterApp()
+{
+    qWarning() << QApplication::applicationName() << "exitting";
+}
+
 void
 GreeterApp::markBusy()
 {
@@ -344,6 +349,16 @@ main(int argc ATTR_UNUSED, char **argv)
         setenv("LANGUAGE", _language, 1);
     }
 
+    // call pseudoReset here, which will kill all existing clients
+    // of the X11 display (hopefully) before we create any of our own.
+    {
+        Display *display = XOpenDisplay(dname);
+        if (display) {
+            pseudoReset(display);
+            XCloseDisplay(display);
+        }
+    }
+
     // fool qt's platform detection so it loads the kde platform plugin
     setenv("KDE_FULL_SESSION", "true", 1);
     setenv("KDE_SESSION_VERSION", "5", 1);
@@ -354,6 +369,8 @@ main(int argc ATTR_UNUSED, char **argv)
     static char *fakeArgv[] = { (char *)"kdmgreet", 0 };
     static int fakeArgc = as(fakeArgv) - 1;
 
+    GreeterApp app(fakeArgc, fakeArgv);
+
     KAboutData about(fakeArgv[0], fakeArgv[0], QStringLiteral(KDM5_VERSION),
                        "Login Manager for KDE", KAboutLicense::GPL,
                        "(c) 1996-2010 The KDM Authors", QString(),
@@ -362,11 +379,11 @@ main(int argc ATTR_UNUSED, char **argv)
     KCrash::setFlags(KCrash::KeepFDs | KCrash::SaferDialog | KCrash::AlwaysDirectly);
     KCrash::setDrKonqiEnabled(true);
     XSetIOErrorHandler(xIOErr);
+
     foreach (const QString &dir, KGlobal::dirs()->resourceDirs("qtplugins")) {
         qWarning() << "addLibraryPath" << dir;
         QCoreApplication::addLibraryPath(dir);
     }
-    GreeterApp app(fakeArgc, fakeArgv);
     initQAppConfig();
     // KGlobalSettings::self()->activate(KGlobalSettings::ApplySettings) :
     {
@@ -401,6 +418,9 @@ main(int argc ATTR_UNUSED, char **argv)
             dw->screenNumber(QPoint(0, 0));
 
     _colorScheme = KStandardDirs::locate("data", "color-schemes/" + _colorScheme + ".colors");
+//     qWarning() << "_colorScheme via KStandardDirs:" << _colorScheme;
+//     _colorScheme = QStandardPaths::locate(QStandardPaths::GenericDataLocation, "color-schemes/" + _colorScheme + ".colors");
+//     qWarning() << "_colorScheme via QStandardPaths:" << _colorScheme;
     if (!_colorScheme.isEmpty()) {
         KSharedConfigPtr config = KSharedConfig::openConfig(_colorScheme, KConfig::SimpleConfig);
         app.setPalette(KColorScheme::createApplicationPalette(config));

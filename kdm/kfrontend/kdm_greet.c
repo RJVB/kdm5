@@ -316,6 +316,8 @@ ignoreErrors(Display *dpy ATTR_UNUSED, XErrorEvent *event ATTR_UNUSED)
  * this is mostly bogus -- but quite useful.  I wish the protocol
  * had some way of enumerating and identifying clients, that way
  * this code wouldn't have to be this kludgy.
+ * TODO: don't kill our own window(s)!!
+ * (why was this never an issue before?!)
  */
 
 static void
@@ -346,7 +348,7 @@ abortReset(int n ATTR_UNUSED)
  * this display connection better not have any windows...
  */
 
-static void
+void
 pseudoReset(Display *dpy)
 {
     int screen;
@@ -395,7 +397,8 @@ secureDisplay(Display *dpy)
     debug("XGrabServer succeeded %s\n", dname);
     (void)alarm(0);
     (void)signal(SIGALRM, SIG_DFL);
-    pseudoReset(dpy);
+    // pseudoReset() has to be called explicitly, before creating any of our own X11 Windows!
+//     pseudoReset(dpy);
     if (!_grabServer) {
         XUngrabServer(dpy);
         XSync(dpy, False);

@@ -57,6 +57,7 @@ void logPanic(const char *fmt, ...) ATTR_NORETURN;
 
 struct _XDisplay;
 
+void pseudoReset(struct _XDisplay *dpy);
 void secureKeyboard(struct _XDisplay *dpy);
 void securePointer(struct _XDisplay *dpy);
 void secureInputs(struct _XDisplay *dpy);

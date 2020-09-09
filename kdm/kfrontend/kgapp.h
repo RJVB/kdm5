@@ -36,6 +36,7 @@ class GreeterApp : public QApplication {
 
   public:
     GreeterApp(int &argc, char **argv);
+    virtual ~GreeterApp();
     void markBusy();
     void enableSendInteract() { sendInteract = true; }
     virtual bool x11EventFilter(void *);
