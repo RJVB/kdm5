@@ -437,7 +437,7 @@ openGreeter()
 
     grttalk.pipe = &grtproc.pipe;
     env = systemEnv(dupEnv(), 0);
-    if (gOpen(&grtproc, (char **)0, "_greet", env, name,
+    if (gOpen(&grtproc, (char **)0, "kdm_greet", env, name,
               greeterUID, td->greeterAuthFile, &td->gpipe))
         sessionExit(EX_UNMANAGE_DPY);
     freeStrArr(env);
