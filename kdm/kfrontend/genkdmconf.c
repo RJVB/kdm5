@@ -699,7 +699,12 @@ static const char def_reset[] =
 "#chown root /dev/console\n"
 "#chmod 622 /dev/console\n"
 "\n"
-"# XDM configurations typically have sessreg here. KDM has it built-in.\n";
+"# XDM configurations typically have sessreg here. KDM has it built-in.\n"
+"\n"
+"# Use common Xreset framework if it exist\n"
+"if [ -x /etc/X11/Xreset ] ; then\n"
+"   /etc/X11/Xreset\n"
+"fi";
 
 static const char def_session1[] =
 "#! /bin/sh\n"
