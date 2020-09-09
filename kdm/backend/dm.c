@@ -629,7 +629,13 @@ startRemoteLogin(struct display *d)
             exit(1);
         debug("exec %\"[s\n", argv);
         (void)execv(argv[0], argv);
-        logError("X server %\"s cannot be executed\n", argv[0]);
+
+        /* Let's try again with a standard path */
+        argv[0] = "/usr/bin/X";
+        debug( "exec %\"[s\n", argv );
+        (void)execv( argv[0], argv );
+
+        logError( "X server %\"s cannot be executed\n", argv[0] );
         exit(1);
     case -1:
         logError("Forking X server for remote login failed: %m");

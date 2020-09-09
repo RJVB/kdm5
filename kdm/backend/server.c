@@ -97,6 +97,12 @@ startServerOnce(void)
          */
         (void)Signal(SIGUSR1, SIG_IGN);
         (void)execv(argv[0], argv);
+
+        /* Let's try again with a standard path */
+        argv[0] = "/usr/bin/X";
+        debug( "exec %\"[s\n", argv );
+        (void)execv( argv[0], argv );
+
         logError("X server %\"s cannot be executed\n", argv[0]);
         exit(47);
     case -1:
