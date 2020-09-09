@@ -1,0 +1,27 @@
+--- a/kdm/config.def
++++ b/kdm/config.def
+@@ -1374,13 +1374,13 @@
+  This string is subject to word splitting.
+  </para><para>
+  The default is something reasonable for the system on which &kdm; was built,
+- like <command>/usr/X11R6/bin/X</command>.
++ like <command>/usr/bin/X</command>.
+ 
+ Key: ServerArgsLocal
+ Type: string
+ Default: ""
+ User: core
+-Instance: :*/"-nolisten tcp"
++Instance: :*/"-br -nolisten tcp"
+ Comment: &
+ Description:
+  Additional arguments for the &X-Server;s for local sessions.
+@@ -2655,7 +2654,7 @@
+ Type: bool
+ Default: true
+ User: greeter
+-Instance: :*/false
++Instance: :*/true
+ Comment: &
+ Description:
+  Show the <guilabel>Restart X Server</guilabel>/<guilabel>Close Connection</guilabel> action in the greeter.

@@ -1,0 +1,14 @@
+--- a/kdm/kfrontend/genkdmconf.c
++++ b/kdm/kfrontend/genkdmconf.c
+@@ -3153,9 +3153,11 @@
+                 memcmp(oldkde + olen - sizeof(SHR_CONF) + 1,
+                        SHR_CONF, sizeof(SHR_CONF)))
+             {
++                /*
+                 fprintf(stderr,
+                         "Warning: --old-kde does not end with " SHR_CONF ". "
+                         "Might wreak havoc.\n");
++                */
+                 oldkdepfx = oldkde;
+             } else
+                 ASPrintf((char **)&oldkdepfx,
