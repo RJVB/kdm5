@@ -812,7 +812,7 @@ print OUTFILE
   emit_defs(\%ov_greet_defs)."\n\n".
   "#endif /* WANT_GREET_DEFS */\n\n\n";
 
-######### genkdmconf definitions #########
+######### genkdmconf5 definitions #########
 
 print OUTFILE
   "#if defined(WANT_CONF_GEN) && !defined(CONF_GEN_DEFINED)\n".

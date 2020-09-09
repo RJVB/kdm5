@@ -47,10 +47,10 @@ if (SECURE_RPC)
 endif (SECURE_RPC)
 macro_add_file_dependencies(dm.h ${confci})
 macro_add_file_dependencies(error.c ${CMAKE_CURRENT_SOURCE_DIR}/printf.c)
-add_executable(kdm ${kdm_SRCS})
-ecm_mark_nongui_executable(kdm)
+add_executable(kdm5 ${kdm_SRCS})
+ecm_mark_nongui_executable(kdm5)
 add_definitions(-U_REENTRANT)
-target_link_libraries( kdm
+target_link_libraries( kdm5
 	${X11_X11_LIB} ${X11_Xau_LIB} ${X11_Xdmcp_LIB} ${X11_X_EXTRA_LIBS}
 	${UNIXAUTH_LIBRARIES}
 	${SHADOW_LIBRARIES}
@@ -64,17 +64,17 @@ target_link_libraries( kdm
 )
 if (CKCONNECTOR_FOUND)
 	include_directories(${CKCONNECTOR_INCLUDE_DIR} ${DBUS_INCLUDE_DIR} ${DBUS_ARCH_INCLUDE_DIR})
-	target_link_libraries( kdm ${CKCONNECTOR_LIBRARIES} ${DBUS_LIBRARIES} )
+	target_link_libraries( kdm5 ${CKCONNECTOR_LIBRARIES} ${DBUS_LIBRARIES} )
 endif (CKCONNECTOR_FOUND)
 if(UTIL_LIBRARIES)
-	target_link_libraries( kdm ${UTIL_LIBRARIES} )
+	target_link_libraries( kdm5 ${UTIL_LIBRARIES} )
 endif(UTIL_LIBRARIES)
-target_link_libraries( kdm ${POSIX4_LIBRARIES} )
+target_link_libraries( kdm5 ${POSIX4_LIBRARIES} )
 if(QT_RT_LIBRARY)
-	target_link_libraries( kdm ${QT_RT_LIBRARY} )
+	target_link_libraries( kdm5 ${QT_RT_LIBRARY} )
 endif(QT_RT_LIBRARY)
 
-add_dependencies( kdm ConfigCi )
+add_dependencies( kdm5 ConfigCi )
 
-install(TARGETS kdm ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS kdm5 ${INSTALL_TARGETS_DEFAULT_ARGS})
 

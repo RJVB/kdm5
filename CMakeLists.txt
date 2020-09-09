@@ -67,14 +67,16 @@ add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0)
 find_package(KF5 REQUIRED COMPONENTS
     Auth Config ConfigWidgets Crash DBusAddons DocTools 
     GuiAddons I18n IconThemes 
-    KCMUtils KIO Parts Plasma Pty Wallet )
+    KCMUtils KIO Parts Plasma Pty Wallet
+    KDE4Support)
 
-# needed for set_package_properties macro
-find_package(KF5KDE4Support REQUIRED NO_MODULE)
+if (WITH_KDM_XCONSOLE)
+    find_package(KF5Pty REQUIRED)
+endif()
 
 find_package(Q5ImageBlitz)
 set_package_properties(Q5ImageBlitz PROPERTIES DESCRIPTION "An image effects library for Qt5"
-                       URL "https://github.com/mylxiaoyi/qimageblitz"
+                       URL "https://github.com/RJVB/q5imageblitz"
                        TYPE REQUIRED
                       )
 
@@ -99,6 +101,8 @@ add_feature_info("Automated testing of X clients" X11_XTest_FOUND
                "The X11 Testing Resource extension library is useful for automated testing of X clients")
 add_feature_info("libXau" X11_Xau_FOUND "The X11 Authorization Protocol library may be used by KDM")
 add_feature_info("LibXdmcp" X11_Xdmcp_FOUND "The X Display Manager Control Protocol library may be used by KDM")
+
+find_package(Perl REQUIRED)
 
 include(ConfigureChecks.cmake)
 if(NOT WIN32)

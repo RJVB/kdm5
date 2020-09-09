@@ -47,4 +47,4 @@ install(TARGETS kgreet_generic  DESTINATION ${PLUGIN_INSTALL_DIR} )
 
 ########### install files ###############
 
-install( FILES kgreeterplugin.h DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel )
+install( FILES kgreeterplugin.h DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}/libkdm COMPONENT Devel )

@@ -1664,21 +1664,21 @@ $<envar>DM_CONTROL</envar>; the name of per-display sockets can be derived
 from $<envar>DISPLAY</envar>.</para>
 </listitem>
 <listitem>
-<para>By using the <command>kdmctl</command> command (&eg; from within a
-shell script). Try <command>kdmctl</command> <option>-h</option> to find out
+<para>By using the <command>kdmctl5</command> command (&eg; from within a
+shell script). Try <command>kdmctl5</command> <option>-h</option> to find out
 more.</para>
 </listitem>
 </itemizedlist>
 
 <para>Here is an example bash script <quote>reboot into FreeBSD</quote>:</para>
 
-<programlisting>if kdmctl | grep -q shutdown; then
+<programlisting>if kdmctl5 | grep -q shutdown; then
   IFS=$'\t'
-  set -- `kdmctl listbootoptions`
+  set -- `kdmctl5 listbootoptions`
   if [ "$1" = ok ]; then
     fbsd=$(echo "$2" | tr ' ' '\n' | sed -ne 's,\\s, ,g;/freebsd/I{p;q}')
     if [ -n "$fbsd" ]; then
-      kdmctl shutdown reboot "=$fbsd" ask &gt; /dev/null
+      kdmctl5 shutdown reboot "=$fbsd" ask &gt; /dev/null
     else
       echo "FreeBSD boot unavailable."
     fi

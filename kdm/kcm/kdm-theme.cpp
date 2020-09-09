@@ -382,7 +382,7 @@ void KDMThemeWidget::removeSelectedThemes()
 
 void KDMThemeWidget::getNewStuff()
 {
-    KNS3::DownloadDialog dialog("kdm.knsrc", this);
+    KNS3::DownloadDialog dialog("kdm5.knsrc", this);
     dialog.exec();
     KNS3::Entry::List entries = dialog.changedEntries();
     for (int i = 0; i < entries.size(); i ++) {

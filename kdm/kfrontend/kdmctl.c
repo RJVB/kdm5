@@ -162,7 +162,7 @@ main(int argc, char **argv)
             ptr++;
         if (!strcmp(ptr, "h") || !strcmp(ptr, "help")) {
             puts(
-"Usage: kdmctl [options] [command [command arguments]]\n"
+"Usage: kdmctl5 [options] [command [command arguments]]\n"
 "\n"
 "Options are:\n"
 " -h -help     This help message.\n"
@@ -184,7 +184,7 @@ main(int argc, char **argv)
 "Command arguments can be specified as separate command line parameters,\n"
 "in which case they are simply concatenated with tabs in between.\n"
 "\n"
-"If the command is '-', kdmctl reads commands from stdin.\n"
+"If the command is '-', kdmctl5 reads commands from stdin.\n"
 "The default command is 'caps'.\n"
            );
             return 0;

@@ -126,7 +126,7 @@ static void *Malloc(size_t size);
 static void *Realloc(void *ptr, size_t size);
 
 #define PRINT_QUOTES
-#define LOG_NAME "kdm_config"
+#define LOG_NAME "kdm5_config"
 #define LOG_DEBUG_MASK DEBUG_CONFIG
 #define LOG_PANIC_EXIT 1
 #define STATIC static

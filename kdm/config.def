@@ -878,7 +878,7 @@ Key: PidFile
 Type: string
 Default: ""
 User: core
-Instance: "/var/run/kdm.pid"
+Instance: "/var/run/kdm5.pid"
 Merge: xdm
 Comment:
  Where &kdm; should store its PID (do not store if empty).

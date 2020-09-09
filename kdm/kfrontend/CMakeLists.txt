@@ -77,7 +77,7 @@ add_executable(kdm_greet ${kdm_greet_SRCS})
 ecm_mark_nongui_executable(kdm_greet)
 target_link_libraries(kdm_greet
     KF5::CoreAddons KF5::ConfigCore KF5::I18n
-    KF5::Pty KF5::WidgetsAddons KF5::KDELibs4Support
+    KF5::WidgetsAddons KF5::KDELibs4Support
     Qt5::Core Qt5::Widgets Qt5::Network Qt5::Svg Qt5::X11Extras
     ${QT_QTXML_LIBRARY}
     ${X11_X11_LIB} ${POSIX4_LIBRARIES})
@@ -85,19 +85,19 @@ if (X11_XTest_FOUND)
   target_link_libraries(kdm_greet ${X11_XTest_LIB})
 endif (X11_XTest_FOUND)
 if (WITH_KDM_XCONSOLE)
-  target_link_libraries(kdm_greet ${KDE4_KPTY_LIBS})
+  target_link_libraries(kdm_greet KF5::Pty)
 endif (WITH_KDM_XCONSOLE)
 
 install(TARGETS kdm_greet DESTINATION ${LIBEXEC_INSTALL_DIR})
 
 set(kdm_config_SRCS kdm_config.c)
 macro_add_file_dependencies(kdm_config.c ${confci})
-add_executable(kdm_config ${kdm_config_SRCS})
-ecm_mark_nongui_executable(kdm_config)
-target_compile_options(kdm_config PRIVATE -U_REENTRANT)
-target_link_libraries(kdm_config ${SOCKET_LIBRARIES} ${RESOLV_LIBRARIES} ${POSIX4_LIBRARIES})
-add_dependencies(kdm_config ConfigCi)
-install(TARGETS kdm_config DESTINATION ${LIBEXEC_INSTALL_DIR})
+add_executable(kdm5_config ${kdm_config_SRCS})
+ecm_mark_nongui_executable(kdm5_config)
+target_compile_options(kdm5_config PRIVATE -U_REENTRANT)
+target_link_libraries(kdm5_config ${SOCKET_LIBRARIES} ${RESOLV_LIBRARIES} ${POSIX4_LIBRARIES})
+add_dependencies(kdm5_config ConfigCi)
+install(TARGETS kdm5_config DESTINATION ${LIBEXEC_INSTALL_DIR})
 
 set(krootimage_SRCS krootimage.cpp krootimage.h ${backgroundlib_SRCS})
 add_executable(krootimage ${krootimage_SRCS})
@@ -111,24 +111,24 @@ install(TARGETS krootimage DESTINATION ${LIBEXEC_INSTALL_DIR})
 
 set(genkdmconf_SRCS genkdmconf.c)
 macro_add_file_dependencies(genkdmconf.c ${confci})
-add_executable(genkdmconf ${genkdmconf_SRCS})
-ecm_mark_nongui_executable(genkdmconf)
-target_compile_options(genkdmconf PRIVATE -U_REENTRANT)
-target_link_libraries(genkdmconf ${X11_LIBRARIES})
-add_dependencies(genkdmconf ConfigCi)
-install(TARGETS genkdmconf ${INSTALL_TARGETS_DEFAULT_ARGS})
+add_executable(genkdmconf5 ${genkdmconf_SRCS})
+ecm_mark_nongui_executable(genkdmconf5)
+target_compile_options(genkdmconf5 PRIVATE -U_REENTRANT)
+target_link_libraries(genkdmconf5 ${X11_LIBRARIES})
+add_dependencies(genkdmconf5 ConfigCi)
+install(TARGETS genkdmconf5 ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 set(kdmctl_SRCS kdmctl.c)
-add_executable(kdmctl ${kdmctl_SRCS})
-ecm_mark_nongui_executable(kdmctl)
-target_compile_options(kdmctl PRIVATE -U_REENTRANT)
-target_link_libraries(kdmctl ${SOCKET_LIBRARIES})
-add_dependencies(kdmctl ConfigCi)
+add_executable(kdmctl5 ${kdmctl_SRCS})
+ecm_mark_nongui_executable(kdmctl5)
+target_compile_options(kdmctl5 PRIVATE -U_REENTRANT)
+target_link_libraries(kdmctl5 ${SOCKET_LIBRARIES})
+add_dependencies(kdmctl5 ConfigCi)
 
-install(TARGETS kdmctl ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS kdmctl5 ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 
-# use 'GENKDMCONF_FLAGS=... make install' to add flags to the config generation (try genkdmconf -h)
+# use 'GENKDMCONF_FLAGS=... make install' to add flags to the config generation (try genkdmconf5 -h)
 install(CODE "
-exec_program(\"${CMAKE_CURRENT_BINARY_DIR}/genkdmconf\" ARGS --in \\\"\\\$DESTDIR${CONFIG_INSTALL_DIR}/kdm\\\" --no-in-notice --face-src \\\"${CMAKE_CURRENT_SOURCE_DIR}/pics\\\" \\\$GENKDMCONF_FLAGS)
+exec_program(\"${CMAKE_CURRENT_BINARY_DIR}/genkdmconf5\" ARGS --in \\\"\\\$DESTDIR${CONFIG_INSTALL_DIR}/kdm\\\" --no-in-notice --face-src \\\"${CMAKE_CURRENT_SOURCE_DIR}/pics\\\" \\\$GENKDMCONF_FLAGS)
 ")

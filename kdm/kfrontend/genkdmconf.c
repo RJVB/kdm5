@@ -3007,7 +3007,7 @@ int main(int argc, char **argv)
     for (ap = 1; ap < argc; ap++) {
         if (!strcmp(argv[ap], "--help")) {
             printf(
-"genkdmconf - generate configuration files for kdm\n"
+"genkdmconf5 - generate configuration files for kdm\n"
 "\n"
 "If an older xdm/kdm configuration is found, its config files are \"absorbed\";\n"
 "if it lives in the new target directory, its scripts are reused (and possibly\n"
@@ -3318,7 +3318,7 @@ int main(int argc, char **argv)
 "Old files that would have been overwritten were renamed to <oldname>.bak.\n");
     }
     fprintf_(f,
-"\nTry 'genkdmconf --help' if you want to generate another configuration.\n"
+"\nTry 'genkdmconf5 --help' if you want to generate another configuration.\n"
 "\nYou may delete this README.\n");
     fclose_(f);
 

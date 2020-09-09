@@ -63,7 +63,7 @@ Name[zh_CN]=登录管理器控制模块
 Name[zh_TW]=登入管理控制模組
 Icon=preferences-system-login
 
-[org.kde.kcontrol.kcmkdm.save]
+[org.kde.kcontrol.kcmkdm5.save]
 Name=Save the Login Manager settings
 Name[ar]=احفظ إعدادات مدير الولوج
 Name[ast]=Guardar les preferencies de la xestión d'accesu
@@ -312,7 +312,7 @@ Description[zh_TW]=變更登入管理員中的使用者圖像需要管理員授�
 Policy=auth_admin
 Persistence=session
 
-[org.kde.kcontrol.kcmkdm.managethemes]
+[org.kde.kcontrol.kcmkdm5.managethemes]
 Name=Manage themes for the Login Manager
 Name[ar]=أدر سمات مدير الولوج
 Name[ast]=Xestionar temes del xestor d'accesu

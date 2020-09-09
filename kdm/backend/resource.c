@@ -166,7 +166,7 @@ getDeps()
     for (i = 0; i < as(cfgMapT); i++) {
         gSendInt(cfgMapT[i]);
         if ((cfgMap[i] = gRecvInt()) < 0) {
-            logError("Config reader does not support config cathegory %#x\n",
+            logError("Config reader does not support config category %#x\n",
                      cfgMapT[i]);
             ret = False;
         }

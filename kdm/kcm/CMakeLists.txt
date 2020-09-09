@@ -84,15 +84,15 @@ target_link_libraries(kcmkdmhelper
     Qt5::Core)
 install(TARGETS kcmkdmhelper DESTINATION ${KAUTH_HELPER_INSTALL_DIR})
 
-kauth_install_helper_files(kcmkdmhelper org.kde.kcontrol.kcmkdm root)
+kauth_install_helper_files(kcmkdmhelper org.kde.kcontrol.kcmkdm5 root)
 
-kauth_install_actions(org.kde.kcontrol.kcmkdm kcmkdm_actions.actions)
+kauth_install_actions(org.kde.kcontrol.kcmkdm5 kcmkdm5_actions.actions)
 
 ########### install files ###############
 
-install( FILES kdm.desktop  DESTINATION  ${SERVICES_INSTALL_DIR} )
+install( FILES kdm5.desktop  DESTINATION  ${SERVICES_INSTALL_DIR} )
 
 install( FILES anchor.png  DESTINATION  ${DATA_INSTALL_DIR}/kcontrol/pics )
 if (KDM_THEMEABLE)
-    install( FILES kdm.knsrc DESTINATION ${CONFIG_INSTALL_DIR} )
+    install( FILES kdm5.knsrc DESTINATION ${CONFIG_INSTALL_DIR} )
 endif()
