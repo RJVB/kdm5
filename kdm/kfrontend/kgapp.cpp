@@ -33,6 +33,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #endif
 #ifdef KDM_THEMEABLE
 #include "themer/kdmthemer.h"
+#else
+#include <QStyleFactory>
 #endif
 #include "utils.h"
 
@@ -380,9 +382,12 @@ main(int argc ATTR_UNUSED, char **argv)
     KCrash::setDrKonqiEnabled(true);
     XSetIOErrorHandler(xIOErr);
 
+    const auto libPaths = QCoreApplication::libraryPaths();
     foreach (const QString &dir, KGlobal::dirs()->resourceDirs("qtplugins")) {
-        qWarning() << "addLibraryPath" << dir;
-        QCoreApplication::addLibraryPath(dir);
+        if (!libPaths.contains(dir)) {
+            qInfo() << "addLibraryPath" << dir;
+            QCoreApplication::addLibraryPath(dir);
+        }
     }
     initQAppConfig();
     // KGlobalSettings::self()->activate(KGlobalSettings::ApplySettings) :
@@ -412,18 +417,22 @@ main(int argc ATTR_UNUSED, char **argv)
     Display *dpy = QX11Info::display();
     QDesktopWidget *dw = app.desktop();
 
-    if (_greeterScreen < 0)
+    if (_greeterScreen < 0) {
         _greeterScreen = _greeterScreen == -2 ?
             dw->screenNumber(QPoint(dw->width() - 1, 0)) :
             dw->screenNumber(QPoint(0, 0));
+    }
 
-    _colorScheme = KStandardDirs::locate("data", "color-schemes/" + _colorScheme + ".colors");
-//     qWarning() << "_colorScheme via KStandardDirs:" << _colorScheme;
-//     _colorScheme = QStandardPaths::locate(QStandardPaths::GenericDataLocation, "color-schemes/" + _colorScheme + ".colors");
-//     qWarning() << "_colorScheme via QStandardPaths:" << _colorScheme;
     if (!_colorScheme.isEmpty()) {
-        KSharedConfigPtr config = KSharedConfig::openConfig(_colorScheme, KConfig::SimpleConfig);
-        app.setPalette(KColorScheme::createApplicationPalette(config));
+        qInfo() << "Looking up colour scheme" << _colorScheme;
+//         _colorScheme = KStandardDirs::locate("data", "color-schemes/" + _colorScheme + ".colors");
+        _colorScheme = QStandardPaths::locate(QStandardPaths::GenericDataLocation, "color-schemes/" + _colorScheme + ".colors");
+        if (!_colorScheme.isEmpty()) {
+            KSharedConfigPtr config = KSharedConfig::openConfig(_colorScheme, KConfig::SimpleConfig);
+            app.setPalette(KColorScheme::createApplicationPalette(config));
+        }
+    } else {
+        qWarning() << "No colour scheme configured?!";
     }
 
 #ifdef KDM_THEMEABLE
@@ -451,7 +460,14 @@ main(int argc ATTR_UNUSED, char **argv)
         themer = 0;
     }
 #else
+    _useTheme = false;
 #define themer NULL
+    if (!_GUIStyle.isEmpty()) {
+        qInfo() << "Setting application style to" << _GUIStyle;
+        app.setStyle(QStyleFactory::create(_GUIStyle));
+    } else {
+        qWarning() << "Application \"GUIStyle\" not set?!";
+    }
 #endif
 
     setupModifiers(dpy, _numLockStatus);

@@ -98,7 +98,7 @@ KDMGeneralWidget::KDMGeneralWidget(QWidget *parent)
     connect(guicombo, SIGNAL(activated(int)), SIGNAL(changed()));
     fl->addRow(i18n("GUI s&tyle:"), guicombo);
     wtstr = i18n(
-        "You can choose a basic GUI style here that will be used by KDM only.");
+        "You can choose a basic GUI widget style here that will be used by KDM only.");
     guicombo->setWhatsThis(wtstr);
 
 //     colcombo = new KBackedComboBox(box);
@@ -182,7 +182,7 @@ void KDMGeneralWidget::loadColorSchemes(KBackedComboBox *combo)
 
 void KDMGeneralWidget::loadGuiStyles(KBackedComboBox *combo)
 {
-#if 0
+#ifdef KDM_THEMEABLE
     // XXX: Global + local schemes
     const QStringList list = KGlobal::dirs()->
         findAllResources("data", "kstyle/themes/*.themerc", KStandardDirs::NoDuplicates);
@@ -257,6 +257,8 @@ void KDMGeneralWidget::save()
 
 #ifdef KDM_THEMEABLE
     configGrp.writeEntry("UseTheme", useThemeCheck->isChecked());
+#else
+    configGrp.writeEntry("UseTheme", false);
 #endif
     configGrp.writeEntry("GUIStyle", guicombo->currentId());
     configGrp.writeEntry("ColorScheme", selectedScheme);
