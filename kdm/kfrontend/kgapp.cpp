@@ -40,7 +40,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <kaboutdata.h>
 #include <kcrash.h>
-#include <kprocess.h>
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <kcolorscheme.h>
@@ -51,6 +50,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <kstandarddirs.h>
 
 #include <QDebug>
+#include <QProcess>
 #include <QModelIndex>
 #include <QDesktopWidget>
 #include <QPainter>
@@ -491,13 +491,15 @@ main(int argc ATTR_UNUSED, char **argv)
 #endif
 
     setupModifiers(dpy, _numLockStatus);
-    KProcess *proc = 0;
 //     if (!_grabServer) {
         if (_useBackground && !themer) {
-            proc = new KProcess;
-            *proc << QByteArray(argv[0], strrchr(argv[0], '/') - argv[0] + 1) + "krootimage";
-            *proc << _backgroundCfg;
-            proc->start();
+            auto proc = new QProcess(&app);
+//             *proc << QByteArray(argv[0], strrchr(argv[0], '/') - argv[0] + 1) + "krootimage";
+//             *proc << _backgroundCfg;
+            proc->start(QByteArray(argv[0], strrchr(argv[0], '/') - argv[0] + 1)
+                + QStringLiteral("krootimage ")
+                + QString::fromLatin1(_backgroundCfg));
+            qWarning() << "krootimage started:" << proc->waitForStarted();
         }
         gSendInt(G_SetupDpy);
         gRecvInt();
@@ -559,7 +561,7 @@ main(int argc ATTR_UNUSED, char **argv)
             cmd = G_Greet;
         }
 
-        KProcess *proc2 = 0;
+        QProcess *proc2 = nullptr;
         app.markBusy();
         FDialog *dialog;
 #ifdef XDMCP
@@ -580,9 +582,9 @@ main(int argc ATTR_UNUSED, char **argv)
 #endif
                 dialog = new KStdGreeter;
             if (*_preloader) {
-                proc2 = new KProcess;
-                *proc2 << _preloader;
-                proc2->start();
+                proc2 = new QProcess;
+                proc2->start(QString::fromLatin1(_preloader));
+                proc2->waitForStarted();
             }
         }
         QObject::connect(dialog, SIGNAL(ready()), &app, SLOT(markReady()));
@@ -609,7 +611,6 @@ main(int argc ATTR_UNUSED, char **argv)
 
     KGVerify::done();
 
-    delete proc;
 #ifdef KDM_THEMEABLE
     delete themer;
 #endif
