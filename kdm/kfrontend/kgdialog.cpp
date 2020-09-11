@@ -27,10 +27,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "kconsole.h"
 #include "kdmshutdown.h"
 #include "kdm_greet.h"
+#include "kgapp.h"
 #include "utils.h"
 
 #include <klocalizedstring.h>
+#include <kactionmenu.h>
 
+#include <QDebug>
 #include <QAction>
 #include <QMenu>
 
@@ -67,6 +70,14 @@ KGDialog::completeMenu()
                 SLOT(slotPopulateDisplays()));
     }
 #endif
+
+    auto app = dynamic_cast<GreeterApp*>(GreeterApp::instance());
+    if (app) {
+        auto aMenu = app->colourSchemeMenu(this);
+        inserten(i18n("Palette"), 0, aMenu->menu());
+    } else {
+        qWarning() << Q_FUNC_INFO << "no GreeterApp instance:" << GreeterApp::instance();
+    }
 
     if (_allowClose || _isReserve)
         inserten(_isReserve ? i18n("Canc&el Session") :
@@ -151,6 +162,13 @@ KGDialog::slotActivateMenu(bool)
 void
 KGDialog::slotExit()
 {
+#ifdef HAVE_VTS
+    QList<DpySpec> sess;
+    sess = fetchSessions(0);
+    for (const auto &s : sess) {
+        qWarning() << "Session" << s.session << "for" << s.user << "on" << s.display << "from" << s.from;
+    }
+#endif
     if (verify)
         verify->abort();
     ::exit(_isReserve ? EX_RESERVE : EX_RESERVER_DPY);

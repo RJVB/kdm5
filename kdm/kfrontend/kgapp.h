@@ -29,6 +29,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <QApplication>
 
 class QTimerEvent;
+class KColorSchemeManager;
+class KActionMenu;
 
 class GreeterApp : public QApplication {
     Q_OBJECT
@@ -40,6 +42,8 @@ class GreeterApp : public QApplication {
     void markBusy();
     void enableSendInteract() { sendInteract = true; }
     virtual bool x11EventFilter(void *);
+    void activateScheme(const QString &name);
+    KActionMenu *colourSchemeMenu(QObject *parent = nullptr);
 
   public Q_SLOTS:
     void markReady();
@@ -55,6 +59,9 @@ class GreeterApp : public QApplication {
     bool regrabPtr, regrabKbd, initalBusy, sendInteract;
     QPoint mouseStartPos, dialogStartPos;
     QWidget *dragWidget;
+    KColorSchemeManager *manager;
+    KActionMenu *schemeMenu = nullptr;
+    QString selectedScheme;
 };
 
 #endif /* KGAPP_H */

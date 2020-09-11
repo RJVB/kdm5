@@ -44,12 +44,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <kcolorscheme.h>
+#include <kcolorschememanager.h>
 
 #include <kglobal.h>
 #include <kglobalsettings.h>
 #include <kstandarddirs.h>
 
 #include <QDebug>
+#include <QModelIndex>
 #include <QDesktopWidget>
 #include <QPainter>
 #include <QX11Info>
@@ -84,7 +86,7 @@ sigAlarm(int)
 GreeterApp::GreeterApp(int &argc, char **argv) :
     inherited(argc, argv),
     regrabPtr(false), regrabKbd(false), initalBusy(true), sendInteract(false),
-    dragWidget(0)
+    dragWidget(0), manager(new KColorSchemeManager(this))
 {
     pingInterval = _isLocal ? 0 : _pingInterval;
     if (pingInterval) {
@@ -103,6 +105,22 @@ GreeterApp::~GreeterApp()
 {
     qWarning() << QApplication::applicationName() << "exitting";
 }
+
+void
+GreeterApp::activateScheme(const QString &name)
+{
+    selectedScheme = name;
+    manager->activateScheme(manager->indexForScheme(name));
+}
+
+KActionMenu *GreeterApp::colourSchemeMenu(QObject *parent)
+{
+    if (!schemeMenu) {
+        schemeMenu = manager->createSchemeSelectionMenu(i18n("Palettes"), selectedScheme, parent ? parent : this);
+    }
+    return schemeMenu;
+}
+
 
 void
 GreeterApp::markBusy()
@@ -385,7 +403,7 @@ main(int argc ATTR_UNUSED, char **argv)
     const auto libPaths = QCoreApplication::libraryPaths();
     foreach (const QString &dir, KGlobal::dirs()->resourceDirs("qtplugins")) {
         if (!libPaths.contains(dir)) {
-            qInfo() << "addLibraryPath" << dir;
+            qWarning() << "addLibraryPath" << dir;
             QCoreApplication::addLibraryPath(dir);
         }
     }
@@ -424,13 +442,14 @@ main(int argc ATTR_UNUSED, char **argv)
     }
 
     if (!_colorScheme.isEmpty()) {
-        qInfo() << "Looking up colour scheme" << _colorScheme;
+        qWarning() << "Setting up colour scheme" << _colorScheme;
 //         _colorScheme = KStandardDirs::locate("data", "color-schemes/" + _colorScheme + ".colors");
-        _colorScheme = QStandardPaths::locate(QStandardPaths::GenericDataLocation, "color-schemes/" + _colorScheme + ".colors");
-        if (!_colorScheme.isEmpty()) {
-            KSharedConfigPtr config = KSharedConfig::openConfig(_colorScheme, KConfig::SimpleConfig);
-            app.setPalette(KColorScheme::createApplicationPalette(config));
-        }
+//         _colorScheme = QStandardPaths::locate(QStandardPaths::GenericDataLocation, "color-schemes/" + _colorScheme + ".colors");
+//         if (!_colorScheme.isEmpty()) {
+//             KSharedConfigPtr config = KSharedConfig::openConfig(_colorScheme, KConfig::SimpleConfig);
+//             app.setPalette(KColorScheme::createApplicationPalette(config));
+//         }
+        app.activateScheme(_colorScheme);
     } else {
         qWarning() << "No colour scheme configured?!";
     }
@@ -462,8 +481,9 @@ main(int argc ATTR_UNUSED, char **argv)
 #else
     _useTheme = false;
 #define themer NULL
+    app.setFont(*_normalFont);
     if (!_GUIStyle.isEmpty()) {
-        qInfo() << "Setting application style to" << _GUIStyle;
+        qWarning() << "Setting application style to" << _GUIStyle;
         app.setStyle(QStyleFactory::create(_GUIStyle));
     } else {
         qWarning() << "Application \"GUIStyle\" not set?!";
@@ -471,9 +491,8 @@ main(int argc ATTR_UNUSED, char **argv)
 #endif
 
     setupModifiers(dpy, _numLockStatus);
-    secureDisplay(dpy);
     KProcess *proc = 0;
-    if (!_grabServer) {
+//     if (!_grabServer) {
         if (_useBackground && !themer) {
             proc = new KProcess;
             *proc << QByteArray(argv[0], strrchr(argv[0], '/') - argv[0] + 1) + "krootimage";
@@ -482,7 +501,8 @@ main(int argc ATTR_UNUSED, char **argv)
         }
         gSendInt(G_SetupDpy);
         gRecvInt();
-    }
+//     }
+    secureDisplay(dpy);
 
     gSendInt(G_Ready);
 

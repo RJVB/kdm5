@@ -60,7 +60,7 @@ add_library(kcm_kdm MODULE ${kcm_kdm_PART_SRCS})
 #     KF5::ItemViews
 #     KF5::Emoticons
 target_link_libraries(kcm_kdm ${QIMAGEBLITZ_LIBRARIES}
-    KF5::AuthCore KF5::CoreAddons KF5::Completion KF5::ConfigCore KF5::ConfigWidgets
+    KF5::Auth KF5::CoreAddons KF5::Completion KF5::ConfigCore KF5::ConfigWidgets
     KF5::I18n KF5::IconThemes KF5::WidgetsAddons KF5::Plasma
     KF5::KIOCore KF5::KIOWidgets
     KF5::KDELibs4Support
@@ -80,7 +80,7 @@ install(TARGETS kcm_kdm  DESTINATION ${PLUGIN_INSTALL_DIR})
 add_executable(kcmkdmhelper helper.cpp)
 ecm_mark_nongui_executable(kcmkdmhelper)
 target_link_libraries(kcmkdmhelper
-    KF5::AuthCore KF5::ConfigCore
+    KF5::Auth KF5::ConfigCore
     Qt5::Core)
 install(TARGETS kcmkdmhelper DESTINATION ${KAUTH_HELPER_INSTALL_DIR})
 
