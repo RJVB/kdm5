@@ -71,12 +71,16 @@ KGDialog::completeMenu()
     }
 #endif
 
-    auto app = dynamic_cast<GreeterApp*>(GreeterApp::instance());
-    if (app) {
-        auto aMenu = app->colourSchemeMenu(this);
-        inserten(i18n("Palette"), 0, aMenu->menu());
-    } else {
-        qWarning() << Q_FUNC_INFO << "no GreeterApp instance:" << GreeterApp::instance();
+    if (_switchIf != LOGIN_REMOTE_ONLY) {
+        auto app = dynamic_cast<GreeterApp*>(GreeterApp::instance());
+        if (app) {
+            auto aMenu = app->colourSchemeMenu(this);
+            if (aMenu) {
+                inserten(i18n("Palette"), 0, aMenu->menu());
+            }
+        } else {
+            qWarning() << Q_FUNC_INFO << "no GreeterApp instance:" << GreeterApp::instance();
+        }
     }
 
     if (_allowClose || _isReserve)
@@ -138,8 +142,13 @@ void
 KGDialog::inserten(const QString &txt, const QKeySequence &shortcut, QMenu *cmnu)
 {
     ensureMenu();
-    QAction *action = optMenu->addMenu(cmnu);
-    action->setShortcut(shortcut);
+    QAction *action;
+    if (cmnu) {
+        action = optMenu->addMenu(cmnu);
+        action->setShortcut(shortcut);
+    } else {
+        action = optMenu->addSeparator();
+    }
     action->setText(txt);
 }
 

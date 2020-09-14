@@ -307,6 +307,9 @@ main(int argc, char **argv)
     (void)Signal(SIGCHLD, sigHandler);
     (void)Signal(SIGUSR1, sigHandler);
 
+    // make certain every Qt application we spawn will use X11/XCB
+    setenv("QT_QPA_PLATFORM", strdup("xcb"), 1);
+
     /*
      * Step 2 - run a sub-daemon for each entry
      */

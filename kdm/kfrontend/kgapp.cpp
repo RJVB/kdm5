@@ -529,6 +529,11 @@ main(int argc ATTR_UNUSED, char **argv)
     }
 #endif
 
+    // we should be all set so we should be able to unset QT_QPA_PLATFORM now
+    // so that any application we launch from here on can make its own choice
+    // without having to worry about the incoming QPA setting.
+    unsetenv("QT_QPA_PLATFORM");
+
     int rslt = ex_exit;
     for (;;) {
         int cmd = gRecvInt();
