@@ -75,12 +75,13 @@ endif (WITH_KDM_XCONSOLE)
 macro_add_file_dependencies(kdmconfig.h ${confci})
 add_executable(kdm_greet ${kdm_greet_SRCS})
 ecm_mark_nongui_executable(kdm_greet)
+# TODO: figure out why XCB::XCB doesn't get defined so we can NOT link to ALL XCB libraries
 target_link_libraries(kdm_greet
     KF5::CoreAddons KF5::ConfigCore KF5::I18n
     KF5::WidgetsAddons KF5::KDELibs4Support
     Qt5::Core Qt5::Widgets Qt5::Network Qt5::Svg Qt5::X11Extras
     ${QT_QTXML_LIBRARY}
-    ${X11_X11_LIB} ${POSIX4_LIBRARIES})
+    ${X11_X11_LIB} ${XCB_LIBRARIES} ${POSIX4_LIBRARIES})
 if (X11_XTest_FOUND)
   target_link_libraries(kdm_greet ${X11_XTest_LIB})
 endif (X11_XTest_FOUND)
@@ -102,11 +103,14 @@ install(TARGETS kdm5_config DESTINATION ${LIBEXEC_INSTALL_DIR})
 set(krootimage_SRCS krootimage.cpp krootimage.h ${backgroundlib_SRCS})
 add_executable(krootimage ${krootimage_SRCS})
 ecm_mark_nongui_executable(krootimage)
+# TODO: figure out why XCB::XCB doesn't get defined so we can NOT link to ALL XCB libraries
 target_link_libraries(krootimage
     KF5::CoreAddons KF5::ConfigCore
     KF5::I18n KF5::WidgetsAddons KF5::KDELibs4Support
-    Qt5::Core Qt5::Widgets Qt5::Network Qt5::Svg Qt5::X11Extras
-    ${X11_LIBRARIES} ${QIMAGEBLITZ_LIBRARIES})
+    Qt5::Core Qt5::Widgets Qt5::Network Qt5::Svg
+    ${QIMAGEBLITZ_LIBRARIES}
+    Qt5::X11Extras
+    ${X11_LIBRARIES} ${XCB_LIBRARIES})
 install(TARGETS krootimage DESTINATION ${LIBEXEC_INSTALL_DIR})
 
 set(genkdmconf_SRCS genkdmconf.c)

@@ -442,13 +442,6 @@ main(int argc ATTR_UNUSED, char **argv)
     }
 
     if (!_colorScheme.isEmpty()) {
-        qWarning() << "Setting up colour scheme" << _colorScheme;
-//         _colorScheme = KStandardDirs::locate("data", "color-schemes/" + _colorScheme + ".colors");
-//         _colorScheme = QStandardPaths::locate(QStandardPaths::GenericDataLocation, "color-schemes/" + _colorScheme + ".colors");
-//         if (!_colorScheme.isEmpty()) {
-//             KSharedConfigPtr config = KSharedConfig::openConfig(_colorScheme, KConfig::SimpleConfig);
-//             app.setPalette(KColorScheme::createApplicationPalette(config));
-//         }
         app.activateScheme(_colorScheme);
     } else {
         qWarning() << "No colour scheme configured?!";
@@ -483,7 +476,6 @@ main(int argc ATTR_UNUSED, char **argv)
 #define themer NULL
     app.setFont(*_normalFont);
     if (!_GUIStyle.isEmpty()) {
-        qWarning() << "Setting application style to" << _GUIStyle;
         app.setStyle(QStyleFactory::create(_GUIStyle));
     } else {
         qWarning() << "Application \"GUIStyle\" not set?!";
@@ -499,7 +491,7 @@ main(int argc ATTR_UNUSED, char **argv)
             proc->start(QByteArray(argv[0], strrchr(argv[0], '/') - argv[0] + 1)
                 + QStringLiteral("krootimage ")
                 + QString::fromLatin1(_backgroundCfg));
-            qWarning() << "krootimage started:" << proc->waitForStarted();
+            qDebug() << "krootimage started:" << proc->waitForStarted();
         }
         gSendInt(G_SetupDpy);
         gRecvInt();

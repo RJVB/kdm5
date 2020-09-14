@@ -188,8 +188,10 @@ int KBackgroundRenderer::doBackground(bool quit)
             break;
 
         m_Background.load(file);
-        if (m_Background.isNull())
+        if (m_Background.isNull()) {
+            qWarning() << Q_FUNC_INFO << "Failed to load" << file;
             break;
+        }
         int w = m_Background.width();
         int h = m_Background.height();
         if ((w > m_Size.width()) || (h > m_Size.height())) {
@@ -197,7 +199,8 @@ int KBackgroundRenderer::doBackground(bool quit)
             h = qMin(h, m_Size.height());
             m_Background = m_Background.copy(0, 0, w, h);
         }
-        Blitz::flatten(m_Background, colorA(), colorB());
+        qDebug() << Q_FUNC_INFO << "Background" << file << "colours" << colorA() << "," << colorB()
+            << Blitz::flatten(m_Background, colorA(), colorB());
         break;
     }
     case Program:
@@ -276,11 +279,13 @@ int KBackgroundRenderer::doWallpaper(bool quit)
     if (wpmode != NoWallpaper) {
 wp_load:
         if (currentWallpaper().isEmpty()) {
+            qWarning() << Q_FUNC_INFO << "currentWallpaper not set; NoWallpaper mode";
             wpmode = NoWallpaper;
             goto wp_out;
         }
         QString file = m_pDirs->findResource("wallpaper", currentWallpaper());
         if (file.isEmpty()) {
+            qWarning() << Q_FUNC_INFO << "currentWallpaper not found in wallpapers dir; NoWallpaper mode";
             wpmode = NoWallpaper;
             goto wp_out;
         }
@@ -341,16 +346,18 @@ wp_load:
                 renderer.render(&p);
             }
         } else {
+            qDebug() << Q_FUNC_INFO << "Loading wallpaper" << file;
             m_Wallpaper.load(file);
         }
         if (m_Wallpaper.isNull()) {
-            qWarning() << "failed to load wallpaper " << file ;
+            qWarning() << Q_FUNC_INFO << "failed to load wallpaper " << file ;
             if (discardCurrentWallpaper())
                 goto wp_load;
             wpmode = NoWallpaper;
             goto wp_out;
         }
         m_Wallpaper = m_Wallpaper.convertToFormat(QImage::Format_ARGB32_Premultiplied, Qt::DiffuseAlphaDither);
+        qDebug() << "wallpaper from" << file << ":" << m_Wallpaper;
 
         // If we're previewing, scale the wallpaper down to make the preview
         // look more like the real desktop.
@@ -518,11 +525,9 @@ bool KBackgroundRenderer::canTile() const
 
 void KBackgroundRenderer::wallpaperBlend()
 {
-    auto pEng = QApplication::desktop() ? QApplication::desktop()->paintEngine() : nullptr;
     if (!enabled() || wallpaperMode() == NoWallpaper
             || (blendMode() == NoBlending &&
-                ((!pEng || pEng->hasFeature(QPaintEngine::Antialiasing))
-                 || !m_Wallpaper.hasAlphaChannel()))) {
+                !m_Wallpaper.hasAlphaChannel())) {
         fastWallpaperBlend();
     } else {
         fullWallpaperBlend();
@@ -706,6 +711,7 @@ void KBackgroundRenderer::slotBackgroundDone(int exitCode, QProcess::ExitStatus 
     m_State |= BackgroundDone;
 
     if (exitStatus == QProcess::NormalExit && !exitCode) {
+        qDebug() << Q_FUNC_INFO << "Loading background image from" << m_Tempfile;
         m_Background.load(m_Tempfile->fileName());
         m_State |= BackgroundDone;
     }
@@ -757,6 +763,9 @@ void KBackgroundRenderer::render()
                     m_Pixmap = QPixmap::fromImage(m_Image);
                     m_Cached = true;
                     m_State |= InitCheck | BackgroundDone | WallpaperDone;
+                    qDebug() << Q_FUNC_INFO << "Cached image" << f;
+                } else {
+                    qWarning() << Q_FUNC_INFO << "Failed to cache image" << f;
                 }
             }
         }
@@ -908,11 +917,14 @@ void KBackgroundRenderer::createTempFile()
 
 QString KBackgroundRenderer::cacheFileName()
 {
-    QString f = fingerprint();
-    f.replace(':', '_'); // avoid characters that shouldn't be in filenames
-    f.replace('/', '#');
-    f = KStandardDirs::locateLocal("cache", QString("background/%1x%2_%3.png")
-                                   .arg(m_Size.width()).arg(m_Size.height()).arg(f));
+    QString fp = fingerprint();
+    fp.replace(':', '_'); // avoid characters that shouldn't be in filenames
+    fp.replace('/', '#');
+    QString f = KStandardDirs::locateLocal("cache", QString("background/%1x%2_%3.png")
+                                   .arg(m_Size.width()).arg(m_Size.height()).arg(fp));
+//     qWarning() << Q_FUNC_INFO << "Found cache file" << f;
+//     qWarning() << "\tvia QSP:" << QStandardPaths::locateAll(QStandardPaths::GenericCacheLocation,QString("background/%1x%2_%3.png")
+//                                    .arg(m_Size.width()).arg(m_Size.height()).arg(fp));
     return f;
 }
 
@@ -952,7 +964,7 @@ void KBackgroundRenderer::saveCacheFile()
     if (m_Image.isNull())
         fullWallpaperBlend(); // generate from m_Pixmap
     QString f = cacheFileName();
-    if (KStandardDirs::exists(f) || m_Cached)
+    if (QFileInfo(f).exists() || m_Cached)
         utime(QFile::encodeName(f), NULL);
     else {
         m_Image.save(f, "PNG");

@@ -36,8 +36,10 @@ Boston, MA 02110-1301, USA.
 #include <QPainter>
 #include <QDebug>
 #include <QX11Info>
+#include <QScreen>
 
 #include <X11/Xlib.h>
+#include <X11/Xlib-xcb.h>
 
 #include <stdlib.h>
 
@@ -72,8 +74,9 @@ KVirtualBGRenderer::renderer(unsigned screen)
 QPixmap
 KVirtualBGRenderer::pixmap()
 {
-    if (m_numRenderers == 1)
+    if (m_numRenderers == 1) {
         return m_renderer[0]->pixmap();
+    }
 
     return *m_pPixmap;
 }
@@ -168,6 +171,7 @@ KVirtualBGRenderer::initRenderers()
         r->setSize(renderSize(i));
         connect(r, SIGNAL(imageDone(int)), SLOT(screenDone(int)));
     }
+    qDebug() << Q_FUNC_INFO << "Initialised renderers:" << m_numRenderers;
 }
 
 void
@@ -200,6 +204,7 @@ KVirtualBGRenderer::screenDone(int screen)
         drawPos.setY(int(drawPos.y() * m_scaleY));
 
         QPixmap source = m_renderer[screen]->pixmap();
+        qDebug() << Q_FUNC_INFO << "Pixmap for screen" << screen << ":" << source;
         QSize renderSize = this->renderSize(screen);
         renderSize.setWidth(int(renderSize.width() * m_scaleX));
         renderSize.setHeight(int(renderSize.height() * m_scaleY));
@@ -276,6 +281,7 @@ MyApplication::MyApplication(int &argc, char **argv)
     : QApplication(argc, argv)
 {
     setApplicationVersion(QStringLiteral(KDM5_VERSION));
+    dpy = QX11Info::display();
 }
 
 void MyApplication::init(const QString &confFile)
@@ -289,15 +295,43 @@ void MyApplication::init(const QString &confFile)
     renderer->start();
 }
 
-
 void
+/**
+ * @brief ...
+ * 
+ */
 MyApplication::renderDone()
 {
-    QPalette palette;
-    palette.setBrush(desktop()->backgroundRole(), QBrush(renderer->pixmap()));
+    QPalette palette = desktop()->palette();
+    const QPixmap bgPM = renderer->pixmap();
+    palette.setBrush(desktop()->backgroundRole(), QBrush(bgPM));
     desktop()->setPalette(palette);
-    if (QX11Info::display()) {
-        XClearWindow(QX11Info::display(), desktop()->winId());
+    QApplication::setPalette(palette);
+    if (dpy) {
+        // this should do the trick, did so in Qt4, but doesn't any longer in Qt5:
+        XClearWindow(dpy, desktop()->winId());
+        auto rect = desktop()->screenGeometry();
+        auto _connection = QX11Info::connection();
+        Pixmap dpm = XCreatePixmap(dpy, desktop()->winId(), rect.width(), rect.height(), desktop()->depth());
+        auto _gc = xcb_generate_id(_connection);
+        xcb_create_gc(_connection, _gc, dpm, 0, nullptr);
+        QImage image(bgPM.toImage());
+        const auto h = image.height(), w = image.width();
+        const auto d = desktop()->depth();
+        const auto dwin = desktop()->winId();
+        // There must be a more "elegant" way to achieve this, but at some level it will boil down
+        // to something like this; a 2D loop that blits the image over the entire window.
+        for (int y = 0; y < rect.height(); y += h) {
+            for (int x = 0; x < rect.width(); x += w) {
+                xcb_put_image(
+                    _connection, XCB_IMAGE_FORMAT_Z_PIXMAP, dwin, _gc,
+                    w, h, x, y,
+                    0, d,
+                    image.byteCount(), image.constBits());
+            }
+        }
+        xcb_free_gc(_connection, _gc);
+        XFreePixmap(dpy, dpm);
     }
 
     renderer->saveCacheFile();
@@ -309,7 +343,8 @@ MyApplication::renderDone()
              r->multiWallpaperMode() != KBackgroundSettings::NoMultiRandom))
             return;
     }
-    quit();
+    QTimer::singleShot(5000, this, &MyApplication::quit);
+//     quit();
 }
 
 void
@@ -356,12 +391,16 @@ main(int argc, char *argv[])
     if (args.count() > 0) {
         app.init(args.first());
     }
+
+    if (app.display()) {
+        // Keep color resources after termination
+        XSetCloseDownMode(app.display(), RetainTemporary);
+    }
+
     const auto ret = app.exec();
 
-    if (QX11Info::display()) {
+    if (app.display()) {
         app.flush();
-        // Keep color resources after termination
-        XSetCloseDownMode(QX11Info::display(), RetainTemporary);
     }
 
     return ret;

@@ -80,12 +80,6 @@ set_package_properties(Q5ImageBlitz PROPERTIES DESCRIPTION "An image effects lib
                        TYPE REQUIRED
                       )
 
-find_package(XCB REQUIRED)
-set_package_properties(XCB PROPERTIES DESCRIPTION "X protocol C-language Binding"
-                     URL "http://xcb.freedesktop.org"
-                     TYPE REQUIRED
-                    )
-
 find_package(X11_XCB)
 set_package_properties(X11_XCB PROPERTIES DESCRIPTION "XCB X11 protocol client library"
                      TYPE REQUIRED
@@ -97,10 +91,19 @@ set_package_properties(X11 PROPERTIES DESCRIPTION "X11 libraries"
                      TYPE REQUIRED
                     )
 
+# TODO: figure out what components to use and why XCB::XCB doesn't get defined
+find_package(XCB REQUIRED COMPONENTS XCB)
+set_package_properties(XCB PROPERTIES DESCRIPTION "X protocol C-language Binding"
+                       URL "https://xcb.freedesktop.org/"
+                       TYPE REQUIRED
+                      )
+
 add_feature_info("Automated testing of X clients" X11_XTest_FOUND
                "The X11 Testing Resource extension library is useful for automated testing of X clients")
 add_feature_info("libXau" X11_Xau_FOUND "The X11 Authorization Protocol library may be used by KDM")
 add_feature_info("LibXdmcp" X11_Xdmcp_FOUND "The X Display Manager Control Protocol library may be used by KDM")
+add_feature_info("libxcb" XCB_XCB_FOUND "The lowlevel libxcb library")
+# add_feature_info("libxcb-render" XCB_RENDER_FOUND "The XCB C bindings for XRender")
 
 find_package(Perl REQUIRED)
 

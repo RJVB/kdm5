@@ -101,8 +101,9 @@ void KBackgroundPattern::init(bool force_rw)
     if (force_rw || m_File.isEmpty()) {
         m_File = m_pDirs->saveLocation("dtop_pattern") + m_Name + ".desktop";
         m_pConfig = new KDesktopFile(m_File);
-    } else
+    } else {
         m_pConfig = new KDesktopFile(m_File);
+    }
 
     QFileInfo fi(m_File);
     m_bReadOnly = !fi.isWritable();
@@ -733,8 +734,11 @@ void KBackgroundSettings::readSettings(bool reparse)
     m_ColorB = cg.readEntry("Color2", defColorB);
 
     QString s = cg.readEntry("Pattern");
-    if (!s.isEmpty())
+    if (!s.isEmpty()) {
         KBackgroundPattern::load(s);
+    } else {
+        qWarning() << Q_FUNC_INFO << "No background pattern set";
+    }
 
     s = cg.readEntry("Program");
     if (!s.isEmpty())
@@ -848,14 +852,18 @@ void KBackgroundSettings::updateWallpaperFiles()
     m_WallpaperFiles.clear();
     for (it = m_WallpaperList.begin(); it != m_WallpaperList.end(); ++it) {
         QString file = KStandardDirs::locate("wallpaper", *it);
-        if (file.isEmpty())
+        if (file.isEmpty()) {
+            qWarning() << Q_FUNC_INFO << "Couldn't locate wallpaper file" << *it;
             continue;
+        }
         QFileInfo fi(file);
-        if (!fi.exists())
+        if (!fi.exists()) {
+            qWarning() << Q_FUNC_INFO << "Wallpaper file doesn't exist" << file;
             continue;
-        if (fi.isFile() && fi.isReadable())
+        }
+        if (fi.isFile() && fi.isReadable()) {
             m_WallpaperFiles.append(file);
-        if (fi.isDir()) {
+        } else if (fi.isDir()) {
             QDir dir(file);
             QStringList lst = dir.entryList(QDir::Files | QDir::Readable);
             QStringList::Iterator it;
@@ -865,11 +873,14 @@ void KBackgroundSettings::updateWallpaperFiles()
                 if (fi.isFile() && fi.isReadable())
                     m_WallpaperFiles.append(file);
             }
+        } else {
+            qWarning() << Q_FUNC_INFO << "Wallpaper" << file << "is not a readable file or directory";
         }
     }
 
-    if (m_MultiMode == Random)
+    if (m_MultiMode == Random) {
         randomizeWallpaperFiles();
+    }
 }
 
 // Randomize the m_WallpaperFiles in a non-repeating method.

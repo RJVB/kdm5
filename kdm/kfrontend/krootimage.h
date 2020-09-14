@@ -90,6 +90,7 @@ class MyApplication : public QApplication {
   public:
     MyApplication(int &argc, char **argv);
     void init(const QString &confFile);
+    struct _XDisplay *display() { return dpy; }
 
   private Q_SLOTS:
     void renderDone();
@@ -98,6 +99,7 @@ class MyApplication : public QApplication {
   private:
     KVirtualBGRenderer *renderer = nullptr;
     QTimer timer;
+    struct _XDisplay *dpy;
 };
 
 #endif // __KDM_KROOTIMAGE_H__
