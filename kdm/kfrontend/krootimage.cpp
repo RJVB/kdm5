@@ -40,6 +40,7 @@ Boston, MA 02110-1301, USA.
 
 #include <X11/Xlib.h>
 #include <X11/Xlib-xcb.h>
+#include <xcb/xproto.h>
 
 #include <stdlib.h>
 
@@ -302,34 +303,28 @@ void
  */
 MyApplication::renderDone()
 {
-    QPalette palette = desktop()->palette();
-    const QPixmap bgPM = renderer->pixmap();
-    palette.setBrush(desktop()->backgroundRole(), QBrush(bgPM));
-    desktop()->setPalette(palette);
-    QApplication::setPalette(palette);
     if (dpy) {
-        // this should do the trick, did so in Qt4, but doesn't any longer in Qt5:
-        XClearWindow(dpy, desktop()->winId());
         auto rect = desktop()->screenGeometry();
         auto _connection = QX11Info::connection();
-        Pixmap dpm = XCreatePixmap(dpy, desktop()->winId(), rect.width(), rect.height(), desktop()->depth());
         auto _gc = xcb_generate_id(_connection);
-        xcb_create_gc(_connection, _gc, dpm, 0, nullptr);
-        QImage image(bgPM.toImage());
+        xcb_create_gc(_connection, _gc, desktop()->winId(), 0, nullptr);
+        QImage image(renderer->pixmap().toImage());
         const auto h = image.height(), w = image.width();
         const auto d = desktop()->depth();
-        const auto dwin = desktop()->winId();
-        // There must be a more "elegant" way to achieve this, but at some level it will boil down
-        // to something like this; a 2D loop that blits the image over the entire window.
-        for (int y = 0; y < rect.height(); y += h) {
-            for (int x = 0; x < rect.width(); x += w) {
-                xcb_put_image(
-                    _connection, XCB_IMAGE_FORMAT_Z_PIXMAP, dwin, _gc,
-                    w, h, x, y,
-                    0, d,
-                    image.byteCount(), image.constBits());
-            }
-        }
+        // create an X11 Pixmap from our background image
+        Pixmap dpm = XCreatePixmap(dpy, desktop()->winId(), w, h, desktop()->depth());
+        // maybe use xcb_create_pixmap_from_bitmap_data() instead?
+        xcb_put_image(
+            _connection, XCB_IMAGE_FORMAT_Z_PIXMAP, dpm, _gc,
+            w, h, 0, 0,
+            0, d,
+            image.byteCount(), image.constBits());
+        xcb_flush(_connection);
+        // now we can turn the entire window into an X11 Pixmap
+        // which can then be set as the window background pixmap.
+        xcb_change_window_attributes(_connection, desktop()->winId(), XCB_CW_BACK_PIXMAP, &dpm);
+        xcb_clear_area(_connection, false, desktop()->winId(), 0, 0, rect.width(), rect.height());
+        xcb_flush(_connection);
         xcb_free_gc(_connection, _gc);
         XFreePixmap(dpy, dpm);
     }
