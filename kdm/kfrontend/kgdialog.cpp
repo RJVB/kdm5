@@ -74,8 +74,8 @@ KGDialog::completeMenu()
     if (_switchIf != LOGIN_REMOTE_ONLY) {
         auto app = dynamic_cast<GreeterApp*>(GreeterApp::instance());
         if (app) {
-            auto aMenu = app->colourSchemeMenu(this);
-            if (aMenu) {
+            auto aMenu = app->colourSchemeMenu();
+            if (aMenu && aMenu->menu()) {
                 inserten(i18n("Palette"), 0, aMenu->menu());
             }
         } else {
