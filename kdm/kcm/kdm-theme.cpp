@@ -70,8 +70,8 @@ static int executeThemeAction(QWidget *parent,
 {
     parent->setEnabled(false);
 
-    KAuth::Action action("org.kde.kcontrol.kcmkdm.managethemes");
-    action.setHelperId("org.kde.kcontrol.kcmkdm");
+    KAuth::Action action("org.kde.kcontrol.kcmkdm5.managethemes");
+    action.setHelperId("org.kde.kcontrol.kcmkdm5");
     action.setArguments(helperargs);
 
     auto job = action.execute();

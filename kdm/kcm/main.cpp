@@ -128,7 +128,7 @@ KDModule::KDModule(QWidget *parent, const QVariantList &args)
     , updateOK(false)
 {
     KAboutData *about =
-        new KAboutData(QStringLiteral("kcmkdm"), QStringLiteral("kdmconfig"),
+        new KAboutData(QStringLiteral("kcmkdm5"), QStringLiteral("kdmconfig"),
                        QStringLiteral(KDM5_VERSION), i18n("KDE Login Manager Config Module"),
                        KAboutLicense::GPL,
                        i18n("(c) 1996-2010 The KDM Authors"), QString(),

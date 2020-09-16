@@ -187,7 +187,7 @@ Description[zh_CN]=更改登录管理器设置需要管理员身份的授权
 Description[zh_TW]=變更登入管理設定需要管理員授權
 Policy=auth_admin
 
-[org.kde.kcontrol.kcmkdm.managefaces]
+[org.kde.kcontrol.kcmkdm5.managefaces]
 Name=Manage user images shown in the Login Manager
 Name[ar]=أدر صور المستخدمين الظاهرة في مدير الولوج
 Name[ast]=Xestionar les imáxenes d'usuariu amosaes nel xestor d'accesu

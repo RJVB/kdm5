@@ -277,6 +277,6 @@ ActionReply Helper::managethemes(const QVariantMap &args)
     }
 }
 
-KAUTH_HELPER_MAIN("org.kde.kcontrol.kcmkdm", Helper)
+KAUTH_HELPER_MAIN("org.kde.kcontrol.kcmkdm5", Helper)
 
 #include "moc_helper.cpp"

@@ -69,8 +69,8 @@ static int executeFaceAction(QWidget *parent, const QVariantMap &helperargs)
 {
     parent->setEnabled(false);
 
-    KAuth::Action action(QStringLiteral("org.kde.kcontrol.kcmkdm.managefaces"));
-    action.setHelperId(QStringLiteral("org.kde.kcontrol.kcmkdm"));
+    KAuth::Action action(QStringLiteral("org.kde.kcontrol.kcmkdm5.managefaces"));
+    action.setHelperId(QStringLiteral("org.kde.kcontrol.kcmkdm5"));
     action.setArguments(helperargs);
 
     auto job = action.execute();
