@@ -516,6 +516,17 @@ gOpen(GProc *proc, char **argv, const char *what, char **env, char *cname,
         free(cname);
         return -1;
     }
+    if (margv[1]) {
+        debug("## Will try to launch `%s\n", margv[0]);
+        int i = 1;
+        while (margv[i]) {
+            debug("\t%s\n", margv[i]);
+            i += 1;
+        }
+        debug("\t`\n");
+    } else {
+        debug("## Will try to launch `%s`\n", margv[0]);
+    }
     if (pipe(pip)) {
         logError("Cannot start %s, pipe() failed\n", cname);
         free(cname);
